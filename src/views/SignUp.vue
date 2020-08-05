@@ -55,7 +55,7 @@
                     <template v-slot:selection="{ item, index }">
                       <span style="white-space: pre" v-if="index===0 || index===1">
                         <span>{{ item }}</span>
-                        <span v-if="index<value2.length-1 && index !==2">, </span>
+                        <span v-if="index<value2.length-1 && index !==1">, </span>
                       </span>
                       <span
                         class="grey--text caption"
@@ -107,7 +107,7 @@
                           <template v-slot:selection="{ item, index }">
                       <span style="white-space: pre" v-if="index===0 || index===1">
                         <span>{{ item }}</span>
-                        <span v-if="index<value1.length-1 && index !==2">, </span>
+                        <span v-if="index<value1.length-1 && index !==1">, </span>
                       </span>
                             <span
                               class="grey--text caption"
