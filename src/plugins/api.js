@@ -6,7 +6,7 @@ const BASE_URL = 'http://195.69.187.126:8085'
 const API = {
 	car:{
 		maker:()=>axios.get(`${BASE_URL}/car_maker`),
-		model:()=>axios.get(`${BASE_URL}/car_model`),
+		model:(id)=>axios.get(`${BASE_URL}/car_model?carmaker_id=${id}`),
 		parts:()=>axios.get(`${BASE_URL}/work_type`)
 	},
 	record: {

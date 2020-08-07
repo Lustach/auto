@@ -57,7 +57,7 @@ export default {
 	},
 	methods: {
 		toggle() {
-			console.log(this.group)
+			console.log(this.group,'ALLO')
 			this.$nextTick(() => {
 				if (this.selectedAllGroup) {
 					this.group.models.value = []

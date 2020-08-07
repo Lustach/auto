@@ -3,6 +3,7 @@
 
     <v-row class="text-center">
       <v-col cols="12">
+        {{groups}}
         <!--        <v-img src="https://www.carlogos.org/logo/Volkswagen-logo-2015-1920x1080.png"></v-img>-->
         <v-card class="mx-auto" max-width="344">
           <v-card-text>
@@ -44,29 +45,7 @@
                 </v-col>
                 <!--                auto parts-->
                 <v-col class="pb-0" cols="12" md="12" sm="6">
-                  <Field itemText="name" itemValue="id" :iconInItem="true" :field="carParts" label="Выберите автозапчасти"></Field>
-<!--                  <Field :group="carParts.items" label="Выберите автомобиль"></Field>-->
-<!--                  <v-select-->
-<!--                    :items="carParts.items"-->
-<!--                    hide-details-->
-<!--                    label="Выберите автозапчасти"-->
-<!--                    multiple-->
-<!--                    no-data-text="Нет данных"-->
-<!--                    v-model="carParts.value"-->
-<!--                    item-text="name"-->
-<!--                    item-value="id"-->
-<!--                  >-->
-<!--                    <template v-slot:selection="{ item, index }">-->
-<!--                      <span style="white-space: pre" v-if="index===0 || index===1">-->
-<!--                        <span>{{ item }}</span>-->
-<!--                        <span v-if="index<carParts.value.length-1 && index !==1">, </span>-->
-<!--                      </span>-->
-<!--                      <span-->
-<!--                        class="grey&#45;&#45;text caption"-->
-<!--                        v-if="index === 2"-->
-<!--                      >(+ ещё {{ carParts.value.length - 2 }})</span>-->
-<!--                    </template>-->
-<!--                  </v-select>-->
+                  <Field :field="carParts" itemText="name" itemValue="id" label="Выберите автозапчасти"></Field>
                 </v-col>
                 <v-col class="pa-0 mt-4" cols="12">
                   <v-card :key="j" class="mb-4" elevation="5" v-for="(i,j) in groups">
@@ -77,13 +56,11 @@
                           <v-icon>mdi-close</v-icon>
                         </v-btn>
                       </div>
-                      <Field :iconInItem="true" :field="i.auto" label="Выберите автомобиль"></Field>
-                      <Field :field="i.models" label="Выберите модели"></Field>
-<!--                      <Group :group="i"></Group>-->
+                      <Field :field="i.auto" :iconInItem="true" label="Выберите автомобиль" :multiple="false"></Field>
+                      <Field :disabled="true" :auto="i.auto" :field="i.models" label="Выберите модели"></Field>
                     </v-card-text>
                   </v-card>
-                  <v-btn @click="addGroup" color="blue darken-1" dark
-                         small>
+                  <v-btn @click="addGroup" color="blue darken-1" dark small>
                     <span class="caption text-none font-weight-medium">Добавить марку</span>
                   </v-btn>
                 </v-col>
@@ -104,23 +81,23 @@
 export default {
 	name: 'SignUp',
 	components: {
-		// 'Group': () => import('@/components/Group.vue'),
 		'Field': () => import('@/components/Field.vue')
 	},
 	async mounted() {
 		console.log(this.$API, 'api')
-    try {
-			await Promise.all([this.$API.car.parts(), this.$API.car.maker(), this.$API.car.model()]).then(values => {
-				this.carParts.items=values[0].data.slice()
-				this.carMaker.items=values[1].data.slice()
-				this.carModel.items=values[2].data.slice()
-				console.log(values,'values')
+		try {
+			await Promise.all([this.$API.car.parts(), this.$API.car.maker(), this.$API.car.model(1)]).then(values => {
+				this.carParts.items = values[0].data.slice()
+				this.carMaker.items = values[1].data.slice()
+				this.carModel.items = values[2].data.slice()
+				console.log(values, 'values')
+				console.log(typeof values[0].data, typeof values[1].data, typeof values[2].data, 'lol')
 			})
-		}
-		catch (e) {
-      console.error(e,'error')
+		} catch (e) {
+			console.error(e, 'error')
 		}
 		console.log('hm')
+		this.addGroup()
 		this.addGroup()
 	},
 	data: () => ({
@@ -145,6 +122,7 @@ export default {
 			// const auto =  JSON.parse(JSON.stringify(this.carMaker))
 			// const models =  JSON.parse(JSON.stringify(this.carModel))
 			// console.log(auto)
+			console.log(this.carModel, 'this.carModel', this.carMaker, 'this.carMaker')
 			this.groups.push({
 				auto: JSON.parse(JSON.stringify(this.carMaker)),
 				models: JSON.parse(JSON.stringify(this.carModel))
@@ -152,6 +130,12 @@ export default {
 		},
 		deleteGroup(index) {
 			this.groups.splice(index, 1)
+		}
+	},
+	computed: {
+		disabled: vm => {
+			console.log(vm)
+			return true
 		}
 	},
 }
