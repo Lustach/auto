@@ -44,25 +44,29 @@
                 </v-col>
                 <!--                auto parts-->
                 <v-col class="pb-0" cols="12" md="12" sm="6">
-                  <v-select
-                    :items="carParts.items"
-                    hide-details
-                    label="Выберите автозапчасти"
-                    multiple
-                    no-data-text="Нет данных"
-                    v-model="carParts.value"
-                  >
-                    <template v-slot:selection="{ item, index }">
-                      <span style="white-space: pre" v-if="index===0 || index===1">
-                        <span>{{ item }}</span>
-                        <span v-if="index<carParts.value.length-1 && index !==1">, </span>
-                      </span>
-                      <span
-                        class="grey--text caption"
-                        v-if="index === 2"
-                      >(+ ещё {{ carParts.value.length - 2 }})</span>
-                    </template>
-                  </v-select>
+                  <Field itemText="name" itemValue="id" :iconInItem="true" :field="carParts" label="Выберите автозапчасти"></Field>
+<!--                  <Field :group="carParts.items" label="Выберите автомобиль"></Field>-->
+<!--                  <v-select-->
+<!--                    :items="carParts.items"-->
+<!--                    hide-details-->
+<!--                    label="Выберите автозапчасти"-->
+<!--                    multiple-->
+<!--                    no-data-text="Нет данных"-->
+<!--                    v-model="carParts.value"-->
+<!--                    item-text="name"-->
+<!--                    item-value="id"-->
+<!--                  >-->
+<!--                    <template v-slot:selection="{ item, index }">-->
+<!--                      <span style="white-space: pre" v-if="index===0 || index===1">-->
+<!--                        <span>{{ item }}</span>-->
+<!--                        <span v-if="index<carParts.value.length-1 && index !==1">, </span>-->
+<!--                      </span>-->
+<!--                      <span-->
+<!--                        class="grey&#45;&#45;text caption"-->
+<!--                        v-if="index === 2"-->
+<!--                      >(+ ещё {{ carParts.value.length - 2 }})</span>-->
+<!--                    </template>-->
+<!--                  </v-select>-->
                 </v-col>
                 <v-col class="pa-0 mt-4" cols="12">
                   <v-card :key="j" class="mb-4" elevation="5" v-for="(i,j) in groups">
@@ -73,7 +77,9 @@
                           <v-icon>mdi-close</v-icon>
                         </v-btn>
                       </div>
-                      <Group :group="i"></Group>
+                      <Field :iconInItem="true" :field="i.auto" label="Выберите автомобиль"></Field>
+                      <Field :field="i.models" label="Выберите модели"></Field>
+<!--                      <Group :group="i"></Group>-->
                     </v-card-text>
                   </v-card>
                   <v-btn @click="addGroup" color="blue darken-1" dark
@@ -87,7 +93,6 @@
                 </v-col>
               </v-row>
             </v-form>
-
           </v-card-text>
         </v-card>
       </v-col>
@@ -99,17 +104,28 @@
 export default {
 	name: 'SignUp',
 	components: {
-		'Group': () => import('@/components/Group.vue')
+		// 'Group': () => import('@/components/Group.vue'),
+		'Field': () => import('@/components/Field.vue')
 	},
 	async mounted() {
 		console.log(this.$API, 'api')
-    const result = await this.$API.car.parts()
-		console.log(result)
+    try {
+			await Promise.all([this.$API.car.parts(), this.$API.car.maker(), this.$API.car.model()]).then(values => {
+				this.carParts.items=values[0].data.slice()
+				this.carMaker.items=values[1].data.slice()
+				this.carModel.items=values[2].data.slice()
+				console.log(values,'values')
+			})
+		}
+		catch (e) {
+      console.error(e,'error')
+		}
+		console.log('hm')
 		this.addGroup()
 	},
 	data: () => ({
-		car_maker: [],
-		car_model: [],
+		carMaker: { items: [], value: [] },
+		carModel: { items: [], value: [] },
 		carParts: { items: [], value: [] },
 		items: ['рено', 'ауди', 'лада', 'уаз', 'шевроле', 'ланос', 'бмв', 'гелик'],
 		value: '',
@@ -125,9 +141,13 @@ export default {
 	}),
 	methods: {
 		addGroup() {
+			console.log('addGroup')
+			// const auto =  JSON.parse(JSON.stringify(this.carMaker))
+			// const models =  JSON.parse(JSON.stringify(this.carModel))
+			// console.log(auto)
 			this.groups.push({
-				auto: { items: ['рено', 'ауди', 'лада', 'уаз', 'шевроле', 'ланос', 'бмв', 'гелик'], value: '' },
-				models: { items: ['модель1', 'модель2', 'модель3', 'модель4', 'модель5', 'модель6'], value: [] }
+				auto: JSON.parse(JSON.stringify(this.carMaker)),
+				models: JSON.parse(JSON.stringify(this.carModel))
 			})
 		},
 		deleteGroup(index) {
