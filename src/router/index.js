@@ -6,7 +6,7 @@ Vue.use(VueRouter)
 
   const routes = [
   {
-    path: '/',
+    path: '/:id',
     name: 'SignUp',
     component: ()=>import('../views/SignUp.vue')
   },
