@@ -15,6 +15,7 @@
                     hide-details
                     label="ФИО"
                     outlined
+                    v-model="full_name"
                   ></v-text-field>
                 </v-col>
                 <!--                Comppany-->
@@ -23,6 +24,7 @@
                     hide-details
                     label="Название компании"
                     outlined
+                    v-model="company_name"
                   ></v-text-field>
                 </v-col>
                 <!--                City-->
@@ -31,6 +33,7 @@
                     hide-details
                     label="Город"
                     outlined
+                    v-model="city_name"
                   ></v-text-field>
                 </v-col>
                 <!--                Adress-->
@@ -39,6 +42,7 @@
                     hide-details
                     label="Адрес"
                     outlined
+                    v-model="address"
                   ></v-text-field>
                 </v-col>
                 <!--                auto parts-->
@@ -46,7 +50,7 @@
                   <Field :field="carParts" itemText="name" itemValue="id" label="Выберите автозапчасти"></Field>
                 </v-col>
                 <v-col class="pa-0 mt-4" cols="12">
-                  <v-card :key="j" class="mb-4" elevation="5" v-for="(i,j) in test">
+                  <v-card :key="j" class="mb-4" elevation="5" v-for="(i,j) in groups">
                     <v-card-text>
                       <div class="text-h6" style="display:flex;" v-if="j>0">
                         <v-spacer></v-spacer>
@@ -64,7 +68,7 @@
                 </v-col>
                 <v-col cols="12">
                   <v-checkbox hide-details label="Даю согласие на обработку данных" v-model="checkbox1"></v-checkbox>
-                  <v-btn class="mt-1" color="primary">Подтвердить</v-btn>
+                  <v-btn @click="submit" class="mt-1" color="primary">Подтвердить</v-btn>
                 </v-col>
               </v-row>
             </v-form>
@@ -92,9 +96,12 @@ export default {
 			console.error(e, 'error')
 		}
 		this.addGroup()
-		this.addGroup()
 	},
 	data: () => ({
+		full_name: '',
+		company_name: '',
+		city_name: '',
+		address: '',
 		carMaker: { items: [], value: [] },
 		carModel: { items: [], value: [] },
 		carParts: { items: [], value: [] },
@@ -104,6 +111,18 @@ export default {
 		indexes: [],
 	}),
 	methods: {
+		submit() {
+			const payload = {
+				full_name: this.full_name,
+				company_name: this.company_name,
+				city_name: this.city_name,
+				address: this.address,
+				wt_list: this.carParts.value,
+				carmodel_list: this.groups.reduce(e => e.models.value)
+			}
+			console.log(this.carParts.value, 'thisssss')
+			this.$API.car.addUser(payload)
+		},
 		async getModel(carId, fieldIndex) {
 			this.indexes[fieldIndex] = carId
 			// for (let i = 0; i < this.groups.length; i++) {
@@ -114,14 +133,60 @@ export default {
 			// 		}
 			// 	}
 			// }
-			console.log('CHTO', this.indexes)
+			// if (this.indexes.length > 0) {
+			// 	this.groups.forEach(e => {
+			// 		console.log(e,'EHE')
+			// 	})
+			// }
+			// todo вроде получилось ниже
+			// console.log(this.carMaker.items.filter((e, i) => {
+			// 	console.log(e, i, 'carMaker')
+			// 	return this.indexes.find(el => {
+			// 		console.log(el === e.id, 'find')
+			// 		return el !== e.id
+			// 	})
+			// }), 'this.carMaker')
+			this.groups.forEach((e, i) => {
+				if (!this.indexes[i])
+					e.auto.items = JSON.parse(JSON.stringify(this.carMaker.items.filter((e, i) => {
+						console.log(e, i, 'carMaker')
+						return this.indexes.find(el => {
+							console.log(el === e.id, 'find')
+							return el !== e.id
+						})
+					})))
+				console.log(e.auto.items, 'lolol')
+			})
+			// for (let i = 0; i < this.indexes.length; i++) {
+			// 	if (this.indexes[i]) {
+			// 		console.log(this.indexes[i])
+			// 		this.groups.forEach((e, index) => {
+			// 			console.log(e.auto.items[index], this.indexes[i], 'YES')
+			// 			if (e.auto.items[index].id === this.indexes[i]) {
+			// 				e.auto.items.splice(index, 1)
+			// 				console.log(this.groups, 'E')
+			// 			}
+			// 		})
+			// 	}
+			// }
+			// todo восстановление
+			// for (let i = 0; i < this.indexes.length; i++) {
+			// 	if (this.indexes[i]) {
+			// 		console.log(this.indexes[i])
+			// 		this.groups.forEach((e, index) => {
+			// 			console.log(e.auto.items[index], this.indexes[i], 'YES')
+			// 			if (e.auto.items[index].id === this.indexes[i]) {
+			// 				e.auto.items.splice(index, 1)
+			// 				console.log(this.groups, 'E')
+			// 			}
+			// 		})
+			// 	}
+			// }
+			console.log('CHTO', this.groups)
 			const result = await this.$API.car.model(carId)
 			this.groups[fieldIndex].models.items = result.data
 		},
 		addGroup() {
-			// const auto =  JSON.parse(JSON.stringify(this.carMaker))
-			// const models =  JSON.parse(JSON.stringify(this.carModel))
-			// console.log(auto)
 			this.groups.push({
 				auto: JSON.parse(JSON.stringify(this.carMaker)),
 				models: JSON.parse(JSON.stringify(this.carModel))

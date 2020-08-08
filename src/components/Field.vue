@@ -79,11 +79,13 @@ export default {
 	},
 	methods: {
 		toggle() {
+			console.log('toggle')
 			this.$nextTick(() => {
 				if (this.selectedAllGroup) {
 					this.field.value = []
 				} else {
-					this.field.value = this.field.items.slice()
+					// todo check
+					this.field.value = this.field.items.map(e=>e.id).slice()
 				}
 			})
 		},

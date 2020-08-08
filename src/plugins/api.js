@@ -7,7 +7,10 @@ const API = {
 	car:{
 		maker:()=>axios.get(`${BASE_URL}/car_maker`),
 		model:(id)=>axios.get(`${BASE_URL}/car_model?carmaker_id=${id}`),
-		parts:()=>axios.get(`${BASE_URL}/work_type`)
+		parts:()=>axios.get(`${BASE_URL}/work_type`),
+		addUser:(data)=>axios.post(`${BASE_URL}/add_user`,{
+			params:{data: data}
+		})
 	},
 	record: {
 		getData: () => axios.get(`${BASE_URL}/api/records`)
