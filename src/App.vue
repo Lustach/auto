@@ -31,3 +31,8 @@ export default {
 	}),
 }
 </script>
+<style>
+.v-text-field__details{
+  margin-bottom: 0 !important;
+}
+</style>
