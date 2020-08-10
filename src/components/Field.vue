@@ -3,8 +3,12 @@
 
     <!--&lt;!&ndash;    {{field}}&ndash;&gt;{{field.value}} <h1>{{field}}</h1>-->
     <v-col class="pt-0" cols="12" md="12">
-      <v-select :disabled="disabled && isEmpty" :items="field.items" :label="label" :multiple="multiple"
-                hide-details item-text="name" item-value="id" no-data-text="Нет данных" v-model="field.value">
+      <v-select :clearable="iconInItem" :disabled="disabled && isEmpty" :items="field.items" :label="label" :multiple="multiple"
+                hide-details="auto" item-text="name" item-value="id" no-data-text="Нет данных" v-model="field.value" :rules="[required]">
+<!--                :rules="[-->
+<!--		v => !!v || 'Не может быть пустым',-->
+<!--		v => (v && v.length > 0) || 'Не может быть пустым'-->
+<!--	]">-->
         <!--        Add a tile with Select All as Label and binded on a method that add or remove all items-->
         <v-list-item @click="toggle" ripple slot="prepend-item" v-if="field.items.length>0 && multiple">
           <v-list-item-action>
@@ -12,7 +16,7 @@
           </v-list-item-action>
           <v-list-item-title>Выбрать все</v-list-item-title>
         </v-list-item>
-        <v-divider class="mt-2" slot="prepend-item" v-if="multiple"/>
+        <v-divider class="mt-2" slot="prepend-item" v-if="field.items.length>0 && multiple"/>
         <template v-if="iconInItem" v-slot:item="{ item}">
           <div style="display: flex;align-items: center">
             <!--            <v-checkbox-->
@@ -43,10 +47,13 @@
 
 <script>
 export default {
+	rules: [
+		v => !!v || 'Не может быть пустым',
+		v => (v && v.length > 0) || 'Не может быть пустым'
+	],
 	name: "Group",
 	props: {
-		model:{
-    },
+		model: {},
 		field: {
 			items: [],
 			value: [],
@@ -77,7 +84,22 @@ export default {
 	mounted() {
 		console.log(this.field, 'field')
 	},
+	data: () => ({
+		// fullName: [
+		// 	v => !!v || 'Не может быть пустым',
+		// 	// v => (v && v.length <= 10) || 'Name must be less than 10 characters',
+		// ],
+	}),
 	methods: {
+		required(value) {
+			if (value instanceof Array && value.length === 0) {
+				return 'Не может быть пустым';
+			}
+			if(value===0){
+				return !value
+      }
+			return !!value || 'Не может быть пустым';
+		},
 		toggle() {
 			console.log('toggle')
 			this.$nextTick(() => {
@@ -85,7 +107,7 @@ export default {
 					this.field.value = []
 				} else {
 					// todo check
-					this.field.value = this.field.items.map(e=>e.id).slice()
+					this.field.value = this.field.items.map(e => e.id).slice()
 				}
 			})
 		},
@@ -93,9 +115,9 @@ export default {
 	computed: {
 		test() {
 			console.log('testComputedInField')
-			if(this.model){
+			if (this.model) {
 				return this.model
-			}else{
+			} else {
 				return this.field.value
 			}
 		},

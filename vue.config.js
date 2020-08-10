@@ -2,7 +2,7 @@ module.exports = {
   productionSourceMap: false,
   outputDir: 'dist',
   indexPath: 'index.html',
-  assetsDir: 'static',
+  assetsDir: 'static/auto',
   "transpileDependencies": [
     "vuetify"
   ],

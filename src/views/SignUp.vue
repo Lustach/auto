@@ -7,47 +7,60 @@
           <v-card-text>
             <div class="headline text--primary">Регистрация поставщика</div>
             <p>Введите данные вашей компании, чтобы зарегестрироваться в боте для получения доступа к заказам.</p>
-            <v-form>
+            <!--            ref="form" v-model="valid"-->
+            <v-form ref="form" v-model="valid">
               <v-row>
                 <!--                FIO-->
-                <v-col cols="12" md="12">
-                  <v-text-field
-                    hide-details
-                    label="ФИО"
-                    outlined
-                    v-model="full_name"
-                  ></v-text-field>
+                <v-col class="pb-0" cols="12" md="12">
+                  <!--                  :rules="rules.fullName"-->
+                  <!--                  <v-text-field-->
+                  <!--                    :rules="rules.fullName"-->
+                  <!--                    hide-details="auto"-->
+                  <!--                    label="ФИО"-->
+                  <!--                    outlined-->
+                  <!--                    required-->
+                  <!--                    v-model="fullName"-->
+                  <!--                  ></v-text-field>-->
                 </v-col>
                 <!--                Comppany-->
-                <v-col cols="12" md="12">
+                <v-col class="pb-0" cols="12" md="12">
+                  <!--                  :rules="rules.companyName"-->
                   <v-text-field
-                    hide-details
+                    :rules="rules.companyName"
+                    hide-details="auto"
                     label="Название компании"
                     outlined
-                    v-model="company_name"
+                    required
+                    v-model="companyName"
                   ></v-text-field>
                 </v-col>
                 <!--                City-->
-                <v-col cols="12" md="12">
+                <v-col class="pb-0" cols="12" md="12">
+                  <!--                  :rules="rules.cityName"-->
                   <v-text-field
-                    hide-details
+                    :rules="rules.cityName"
+                    hide-details="auto"
                     label="Город"
                     outlined
-                    v-model="city_name"
+                    required
+                    v-model="cityName"
                   ></v-text-field>
                 </v-col>
                 <!--                Adress-->
                 <v-col class="pb-0" cols="12" md="12">
+                  <!--                  :rules="rules.address"-->
                   <v-text-field
-                    hide-details
+                    :rules="rules.address"
+                    hide-details="auto"
                     label="Адрес"
                     outlined
+                    required
                     v-model="address"
                   ></v-text-field>
                 </v-col>
                 <!--                auto parts-->
                 <v-col class="pb-0" cols="12" md="12">
-                  <Field :field="carParts" itemText="name" itemValue="id" label="Выберите автозапчасти"></Field>
+                  <Field :field="carParts" label="Выберите автозапчасти"></Field>
                 </v-col>
                 <v-col class="pa-0 mt-4" cols="12">
                   <v-card :key="j" class="mb-4" elevation="5" v-for="(i,j) in groups">
@@ -67,11 +80,17 @@
                   </v-btn>
                 </v-col>
                 <v-col cols="12">
-                  <v-checkbox hide-details label="Даю согласие на обработку данных" v-model="checkbox1"></v-checkbox>
-                  <v-btn @click="submit" class="mt-1" color="primary">Подтвердить</v-btn>
+                  <v-layout align-center>
+                    <v-checkbox class="mt-0 pt-0" hide-details v-model="checkbox"></v-checkbox>
+                    <a href="https://telegra.ph/Soglasie-na-obrabotku-dannyh-08-09" target="_blank">Даю согласие на обработку данных</a>
+                  </v-layout>
+                  <!--                  :disabled="!valid"-->
+                  <v-btn :disabled="!valid || !checkbox" @click="submit" class="mt-1" color="primary">Подтвердить</v-btn>
                 </v-col>
               </v-row>
             </v-form>
+            <!--            {{rules[0]}}-->
+            <!--            <v-select :items="items1" :rules="rules" clearable multiple v-model="value1"></v-select>-->
           </v-card-text>
         </v-card>
       </v-col>
@@ -86,6 +105,7 @@ export default {
 		'Field': () => import('@/components/Field.vue')
 	},
 	async mounted() {
+		console.log(this.$route)
 		try {
 			await Promise.all([this.$API.car.parts(), this.$API.car.maker()]).then(values => {
 				this.carParts.items = values[0].data.slice()
@@ -95,59 +115,71 @@ export default {
 		} catch (e) {
 			console.error(e, 'error')
 		}
+		this.carMakerLength = this.carMaker.items.length
 		this.addGroup()
 	},
 	data: () => ({
-		full_name: '',
-		company_name: '',
-		city_name: '',
+		valid: true,
+		rules: {
+			// fullName: [
+			// 	v => !!v || 'Не может быть пустым',
+			// 	// v => (v && v.length <= 10) || 'Name must be less than 10 characters',
+			// ],
+			companyName: [
+				v => !!v || 'Не может быть пустым',
+			],
+			cityName: [
+				v => !!v || 'Не может быть пустым',
+			],
+			address: [
+				v => !!v || 'Не может быть пустым',
+			],
+		},
+		// fullName: '',
+		companyName: '',
+		cityName: '',
 		address: '',
 		carMaker: { items: [], value: [] },
+		carMakerLength: 0,
 		carModel: { items: [], value: [] },
 		carParts: { items: [], value: [] },
-		checkbox1: true,
+		checkbox: false,
 		dialog: false,
 		groups: [],
 		indexes: [],
 	}),
 	methods: {
-		submit() {
-			const payload = {
-				full_name: this.full_name,
-				company_name: this.company_name,
-				city_name: this.city_name,
-				address: this.address,
-				wt_list: this.carParts.value,
-				carmodel_list: this.groups.reduce(e => e.models.value)
+		async submit() {
+			if (this.$refs.form.validate()) {
+				let test = []
+				console.log(this.groups, 'ALLLLO')
+				this.groups.forEach(e => {
+					test.push(...e.models.value)
+				})
+				const payload = {
+					// full_name: this.fullName,
+					company_name: this.companyName,
+					city_name: this.cityName,
+					address: this.address,
+					wt_list: this.carParts.value,
+					carmodel_list: test,
+					user_id: this.$route.params.id
+				}
+				try {
+					await this.$API.car.addUser(payload)
+          alert('Регистрация прошла успешно')
+				} catch {
+          console.error('error')
+				}
 			}
-			console.log(this.carParts.value, 'thisssss')
-			this.$API.car.addUser(payload)
 		},
 		async getModel(carId, fieldIndex) {
+			console.log('indexes')
 			this.indexes[fieldIndex] = carId
-			// for (let i = 0; i < this.groups.length; i++) {
-			// 	if (this.groups) {
-			// 		console.log(this.groups[i].auto.items,this.indexes[fieldIndex])
-			// 		if (this.groups[i].auto.items.id === this.indexes[fieldIndex]) {
-			// 			console.log('popalos')
-			// 		}
-			// 	}
-			// }
-			// if (this.indexes.length > 0) {
-			// 	this.groups.forEach(e => {
-			// 		console.log(e,'EHE')
-			// 	})
-			// }
-			// todo вроде получилось ниже
-			// console.log(this.carMaker.items.filter((e, i) => {
-			// 	console.log(e, i, 'carMaker')
-			// 	return this.indexes.find(el => {
-			// 		console.log(el === e.id, 'find')
-			// 		return el !== e.id
-			// 	})
-			// }), 'this.carMaker')
+			if (this.indexes.length > 0) this.carMaker.items.splice(0, 1)
+			// todo вроде получилось
 			this.groups.forEach((e, i) => {
-				if (!this.indexes[i])
+				if (!this.indexes[i]) {
 					e.auto.items = JSON.parse(JSON.stringify(this.carMaker.items.filter((e, i) => {
 						console.log(e, i, 'carMaker')
 						return this.indexes.find(el => {
@@ -155,20 +187,10 @@ export default {
 							return el !== e.id
 						})
 					})))
+				}
 				console.log(e.auto.items, 'lolol')
 			})
-			// for (let i = 0; i < this.indexes.length; i++) {
-			// 	if (this.indexes[i]) {
-			// 		console.log(this.indexes[i])
-			// 		this.groups.forEach((e, index) => {
-			// 			console.log(e.auto.items[index], this.indexes[i], 'YES')
-			// 			if (e.auto.items[index].id === this.indexes[i]) {
-			// 				e.auto.items.splice(index, 1)
-			// 				console.log(this.groups, 'E')
-			// 			}
-			// 		})
-			// 	}
-			// }
+			this.groups[fieldIndex].models.value = []
 			// todo восстановление
 			// for (let i = 0; i < this.indexes.length; i++) {
 			// 	if (this.indexes[i]) {
@@ -196,11 +218,19 @@ export default {
 			this.groups.splice(index, 1)
 		},
 		selectAll(e, index) {
-			console.log(index, e, 'EJ')
+			this.groups[index].models.value = []
+			console.log(index, e, this.groups[index].models.value, 'EJ')
+			this.groups[index].models.value.push(0)
+			// this.groups[index].auto
 		}
 	},
 	computed: {
 		disabled: (vm) => {
+			// const carMaker = JSON.parse(JSON.stringify(vm.carMaker.items))
+			// check
+			if (vm.groups.length === vm.carMakerLength - 1) {
+				return true
+			}
 			if (vm.groups.length !== 0) {
 				for (let i = 0; i < vm.groups.length; i++) {
 					if (vm.groups[i].auto.value === 0) {
