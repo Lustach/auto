@@ -7,24 +7,26 @@
           <v-card-text>
             <div class="headline text--primary">Регистрация поставщика</div>
             <p>Введите данные вашей компании, чтобы зарегестрироваться в боте для получения доступа к заказам.</p>
-<!--            ref="form" v-model="valid"-->
-            <v-form >
+            <!--            ref="form" v-model="valid"-->
+            <v-form ref="form" v-model="valid">
               <v-row>
                 <!--                FIO-->
                 <v-col class="pb-0" cols="12" md="12">
-<!--                  :rules="rules.fullName"-->
-                  <v-text-field
-                    hide-details="auto"
-                    label="ФИО"
-                    outlined
-                    required
-                    v-model="fullName"
-                  ></v-text-field>
+                  <!--                  :rules="rules.fullName"-->
+<!--                  <v-text-field-->
+<!--                    :rules="rules.fullName"-->
+<!--                    hide-details="auto"-->
+<!--                    label="ФИО"-->
+<!--                    outlined-->
+<!--                    required-->
+<!--                    v-model="fullName"-->
+<!--                  ></v-text-field>-->
                 </v-col>
                 <!--                Comppany-->
                 <v-col class="pb-0" cols="12" md="12">
-<!--                  :rules="rules.companyName"-->
+                  <!--                  :rules="rules.companyName"-->
                   <v-text-field
+                    :rules="rules.companyName"
                     hide-details="auto"
                     label="Название компании"
                     outlined
@@ -34,8 +36,9 @@
                 </v-col>
                 <!--                City-->
                 <v-col class="pb-0" cols="12" md="12">
-<!--                  :rules="rules.cityName"-->
+                  <!--                  :rules="rules.cityName"-->
                   <v-text-field
+                    :rules="rules.cityName"
                     hide-details="auto"
                     label="Город"
                     outlined
@@ -45,8 +48,9 @@
                 </v-col>
                 <!--                Adress-->
                 <v-col class="pb-0" cols="12" md="12">
-<!--                  :rules="rules.address"-->
+                  <!--                  :rules="rules.address"-->
                   <v-text-field
+                    :rules="rules.address"
                     hide-details="auto"
                     label="Адрес"
                     outlined
@@ -77,14 +81,16 @@
                 </v-col>
                 <v-col cols="12">
                   <v-layout align-center>
-                  <v-checkbox hide-details v-model="checkbox1" class="mt-0 pt-0"></v-checkbox>
+                    <v-checkbox class="mt-0 pt-0" hide-details v-model="checkbox"></v-checkbox>
                     <a href="https://telegra.ph/Soglasie-na-obrabotku-dannyh-08-09" target="_blank">Даю согласие на обработку данных</a>
                   </v-layout>
-<!--                  :disabled="!valid"-->
-                  <v-btn @click="submit" class="mt-1" color="primary">Подтвердить</v-btn>
+                  <!--                  :disabled="!valid"-->
+                  <v-btn @click="submit" class="mt-1" color="primary" :disabled="!valid || !checkbox">Подтвердить</v-btn>
                 </v-col>
               </v-row>
             </v-form>
+            <!--            {{rules[0]}}-->
+            <!--            <v-select :items="items1" :rules="rules" clearable multiple v-model="value1"></v-select>-->
           </v-card-text>
         </v-card>
       </v-col>
@@ -99,6 +105,7 @@ export default {
 		'Field': () => import('@/components/Field.vue')
 	},
 	async mounted() {
+		console.log(this.$route)
 		try {
 			await Promise.all([this.$API.car.parts(), this.$API.car.maker()]).then(values => {
 				this.carParts.items = values[0].data.slice()
@@ -112,23 +119,23 @@ export default {
 		this.addGroup()
 	},
 	data: () => ({
-		// valid: true,
-		// rules: {
-		// 	fullName: [
-		// 		v => !!v || 'Не может быть пустым',
-		// 		// v => (v && v.length <= 10) || 'Name must be less than 10 characters',
-		// 	],
-		// 	companyName: [
-		// 		v => !!v || 'Не может быть пустым',
-		// 	],
-		// 	cityName: [
-		// 		v => !!v || 'Не может быть пустым',
-		// 	],
-		// 	address: [
-		// 		v => !!v || 'Не может быть пустым',
-		// 	],
-		// },
-		fullName: '',
+		valid: true,
+		rules: {
+			// fullName: [
+			// 	v => !!v || 'Не может быть пустым',
+			// 	// v => (v && v.length <= 10) || 'Name must be less than 10 characters',
+			// ],
+			companyName: [
+				v => !!v || 'Не может быть пустым',
+			],
+			cityName: [
+				v => !!v || 'Не может быть пустым',
+			],
+			address: [
+				v => !!v || 'Не может быть пустым',
+			],
+		},
+		// fullName: '',
 		companyName: '',
 		cityName: '',
 		address: '',
@@ -136,23 +143,29 @@ export default {
 		carMakerLength: 0,
 		carModel: { items: [], value: [] },
 		carParts: { items: [], value: [] },
-		checkbox1: true,
+		checkbox: false,
 		dialog: false,
 		groups: [],
 		indexes: [],
 	}),
 	methods: {
 		submit() {
-			const payload = {
-				full_name: this.fullName,
-				company_name: this.companyName,
-				city_name: this.cityName,
-				address: this.address,
-				wt_list: this.carParts.value,
-				carmodel_list: this.groups.reduce(e => e.models.value)
+			if(this.$refs.form.validate()) {
+				let test = []
+				this.groups.forEach(e => {
+					test.push(...e.models.value)
+				})
+				const payload = {
+					// full_name: this.fullName,
+					company_name: this.companyName,
+					city_name: this.cityName,
+					address: this.address,
+					wt_list: this.carParts.value,
+					carmodel_list: test,
+					user_id: this.$route.params.id
+				}
+				this.$API.car.addUser(payload)
 			}
-			console.log(this.carParts.value, 'thisssss')
-			this.$API.car.addUser(payload)
 		},
 		async getModel(carId, fieldIndex) {
 			console.log('indexes')
@@ -171,6 +184,7 @@ export default {
 				}
 				console.log(e.auto.items, 'lolol')
 			})
+			this.groups[fieldIndex].models.value = []
 			// todo восстановление
 			// for (let i = 0; i < this.indexes.length; i++) {
 			// 	if (this.indexes[i]) {
@@ -198,7 +212,10 @@ export default {
 			this.groups.splice(index, 1)
 		},
 		selectAll(e, index) {
-			console.log(index, e, 'EJ')
+			this.groups[index].models.value=[]
+			console.log(index, e, this.groups[index].models.value, 'EJ')
+			this.groups[index].models.value= 0
+			// this.groups[index].auto
 		}
 	},
 	computed: {

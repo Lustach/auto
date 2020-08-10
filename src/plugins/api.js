@@ -1,5 +1,14 @@
 import axios from 'axios'
 
+// axios.create({
+// 	timeout: 30000,
+// 	headers: {
+// 		'Access-Control-Allow-Origin': '*',
+// 		'Content-Type': 'application/json',
+// 		'Accept': 'application/json',
+// 	}
+// })
+
 const BASE_URL = 'http://195.69.187.126:8085'
 // const token = process.env.VUE_APP_KEY
 //смотреть в экспорт!!
@@ -9,7 +18,7 @@ const API = {
 		model:(id)=>axios.get(`${BASE_URL}/car_model?carmaker_id=${id}`),
 		parts:()=>axios.get(`${BASE_URL}/work_type`),
 		addUser:(data)=>axios.post(`${BASE_URL}/add_user`,{
-			params:{data: data}
+			data
 		})
 	},
 	record: {
