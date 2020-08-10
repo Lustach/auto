@@ -167,6 +167,7 @@ export default {
 				}
 				try {
 					await this.$API.car.addUser(payload)
+          alert('Регистрация прошла успешно')
 				} catch {
           console.error('error')
 				}
