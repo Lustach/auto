@@ -13,14 +13,14 @@
                 <!--                FIO-->
                 <v-col class="pb-0" cols="12" md="12">
                   <!--                  :rules="rules.fullName"-->
-<!--                  <v-text-field-->
-<!--                    :rules="rules.fullName"-->
-<!--                    hide-details="auto"-->
-<!--                    label="ФИО"-->
-<!--                    outlined-->
-<!--                    required-->
-<!--                    v-model="fullName"-->
-<!--                  ></v-text-field>-->
+                  <!--                  <v-text-field-->
+                  <!--                    :rules="rules.fullName"-->
+                  <!--                    hide-details="auto"-->
+                  <!--                    label="ФИО"-->
+                  <!--                    outlined-->
+                  <!--                    required-->
+                  <!--                    v-model="fullName"-->
+                  <!--                  ></v-text-field>-->
                 </v-col>
                 <!--                Comppany-->
                 <v-col class="pb-0" cols="12" md="12">
@@ -85,7 +85,7 @@
                     <a href="https://telegra.ph/Soglasie-na-obrabotku-dannyh-08-09" target="_blank">Даю согласие на обработку данных</a>
                   </v-layout>
                   <!--                  :disabled="!valid"-->
-                  <v-btn @click="submit" class="mt-1" color="primary" :disabled="!valid || !checkbox">Подтвердить</v-btn>
+                  <v-btn :disabled="!valid || !checkbox" @click="submit" class="mt-1" color="primary">Подтвердить</v-btn>
                 </v-col>
               </v-row>
             </v-form>
@@ -149,9 +149,10 @@ export default {
 		indexes: [],
 	}),
 	methods: {
-		submit() {
-			if(this.$refs.form.validate()) {
+		async submit() {
+			if (this.$refs.form.validate()) {
 				let test = []
+				console.log(this.groups, 'ALLLLO')
 				this.groups.forEach(e => {
 					test.push(...e.models.value)
 				})
@@ -164,7 +165,11 @@ export default {
 					carmodel_list: test,
 					user_id: this.$route.params.id
 				}
-				this.$API.car.addUser(payload)
+				try {
+					await this.$API.car.addUser(payload)
+				} catch {
+          console.error('error')
+				}
 			}
 		},
 		async getModel(carId, fieldIndex) {
@@ -212,9 +217,9 @@ export default {
 			this.groups.splice(index, 1)
 		},
 		selectAll(e, index) {
-			this.groups[index].models.value=[]
+			this.groups[index].models.value = []
 			console.log(index, e, this.groups[index].models.value, 'EJ')
-			this.groups[index].models.value= 0
+			this.groups[index].models.value.push(0)
 			// this.groups[index].auto
 		}
 	},
