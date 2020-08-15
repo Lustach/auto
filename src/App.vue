@@ -1,33 +1,25 @@
 <template>
   <v-app>
+    <div class="stars"></div>
+    <div class="twinkling"></div>
 <!--    <v-app-bar-->
 <!--      app-->
 <!--      color="primary"-->
 <!--      dark-->
 <!--    >-->
 <!--    </v-app-bar>-->
-
-<!--    <v-main>-->
-<!--      <HelloWorld/>-->
-<!--    </v-main>-->
-    <v-main>
+    <v-main style="z-index: 3">
     <router-view></router-view>
     </v-main>
   </v-app>
 </template>
 
 <script>
-// import HelloWorld from './components/Auth'
 
 export default {
 	name: 'App',
 
-	components: {
-		// HelloWorld,
-	},
-
 	data: () => ({
-		//
 	}),
 }
 </script>

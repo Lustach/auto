@@ -9,7 +9,7 @@ import axios from 'axios'
 // 	}
 // })
 
-const BASE_URL = 'http://195.69.187.126:8080/api/v1'
+const BASE_URL = 'http://195.69.187.72:8080/api/v1'
 // const token = process.env.VUE_APP_KEY
 //смотреть в экспорт!!
 const API = {
@@ -19,17 +19,18 @@ const API = {
 		parts:()=>axios.get(`${BASE_URL}/work_type`),
 		addUser:(data)=>axios.post(`${BASE_URL}/company-add`,{
 			data
-		})
+		}),
+		phone:(id)=>axios.get(`${BASE_URL}/get_user?user_id=${id}`),
 	},
-	record: {
-		getData: () => axios.get(`${BASE_URL}/api/records`)
+	// record: {
+		// getData: () => axios.get(`${BASE_URL}/api/records`)
 		// chart: {
 		//   getTopArtists: (page?: number, limit?: number) => axios.get(`${BASE_URL}?method=chart.gettopartists&api_key=${token}&format=json`,
 		//     { params: { page: page, limit: limit } }),
 		//   getTopTracks: (page?: number, limit?: number) =>
 		//     axios.get(`${BASE_URL}?method=chart.gettoptracks&api_key=${token}&format=json`),
 		// },
-	},
+	// },
 	// user: {
 	// 	login: (email: string, password: string) => axios.post(`${BASE_URL}/user/login`,
 	// 		{ email: email, password: password }),
