@@ -4,6 +4,8 @@ import router from './router'
 import store from './store'
 import vuetify from './plugins/vuetify';
 import Api from './plugins/api';
+import VueParticles from 'vue-particles'
+Vue.use(VueParticles)
 Vue.use(Api);
 Vue.config.productionTip = false
 

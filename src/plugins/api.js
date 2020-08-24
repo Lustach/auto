@@ -9,7 +9,7 @@ import axios from 'axios'
 // 	}
 // })
 
-const BASE_URL = 'http://195.69.187.72:8080/api/v1'
+const BASE_URL = 'http://195.69.187.126:8080/api/v1'
 // const token = process.env.VUE_APP_KEY
 //смотреть в экспорт!!
 const API = {
@@ -21,6 +21,9 @@ const API = {
 			data
 		}),
 		phone:(id)=>axios.get(`${BASE_URL}/get_user?user_id=${id}`),
+	},
+	settings:{
+		getUser:(id)=>axios.get(`${BASE_URL}/get_company_info?id=${id}`)
 	},
 	// record: {
 		// getData: () => axios.get(`${BASE_URL}/api/records`)

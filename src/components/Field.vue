@@ -1,9 +1,8 @@
 <template>
   <div >
 <!--    {{checkArray(field.value)}}-->
-
-    <!--    {{tempArr}}te-->
-
+<!--{{tempArr}}temp-->
+<!--    {{field.value}}-->
     <div v-if="multiple">
       <v-dialog max-width="364" persistent scrollable v-model="dialog">
         <!--        {{field.value}}-->
@@ -67,7 +66,7 @@
     <v-col class="pt-0" cols="12" md="12">
       <v-select :clearable="iconInItem" :disabled="disabled && isEmpty" :items="field.items" :label="label" :multiple="multiple" :rules="[required]"
                 @click="openDialog($event)" @click:clear="callBack()" hide-details="auto" item-text="name"
-                item-value="id" no-data-text="Нет данных" ref="select" v-model="field.value">
+                item-value="id" no-data-text="Нет данных" ref="select" v-model="field.value" @change="clearModelValue($event)">
         <v-list-item @click="toggle" ripple slot="prepend-item" v-if="field.items.length>0 && multiple">
           <v-list-item-action>
             <v-icon :color="field.value.length > 0 ? 'indigo darken-4' : ''">{{icon}}</v-icon>
@@ -140,14 +139,19 @@ export default {
 		tempArr: [],//for cancel or accept methods /
 	}),
 	methods: {
+		clearModelValue(e){
+      this.$emit('clearModelValue',e)
+      // this.field.value=[]
+    },
 		change(id, index) {
 			this.field.value[index] ? this.$set(this.field.value, index, '') : this.$set(this.field.value, index, id)
 			// this.field.value[index]=id
 		},
 		cancel() {
+			// console.log(this.tempArr)
 			// this.field.value = []
 			this.dialog = false
-			this.field.value = this.tempArr
+			this.field.value = this.tempArr.slice()
 			// this.field.value.filter((e) => {
 			// 	console.log(this.tempArr.indexOf(e),'E')
 			// 	return this.tempArr.indexOf(e) > 0
@@ -172,6 +176,7 @@ export default {
 			// document.querySelector('.v-menu__content').style.display='none'
 		},
 		callBack() {
+			console.log('callBack')
 			this.$emit('getModel')
 		},
 		required(value) {
@@ -185,6 +190,7 @@ export default {
 		},
 		toggle() {
 			this.$nextTick(() => {
+				console.log('toggle')
 				if (this.selectedAllGroup) {
 					this.field.value = []
 				} else {
@@ -250,10 +256,11 @@ export default {
 				// console.log(document.querySelector('.v-menu__content'))
 				// this.$refs.select.$refs.menu.$el.classList.add('.v-menu__content')
 				// console.log(this.$refs.select.$refs.menu.$el)
-				setTimeout(() => {
+				let timerId = setInterval(() => {
 					// this.$refs.select.$refs.menu.$refs.style.display = 'none'
 					this.$refs.select.$children[1].$refs.content.style.display = 'none'
-				}, 300)
+				}, 100)
+				setTimeout(() => { clearInterval(timerId) }, 2000);
 			}
 		}
 	},
@@ -275,98 +282,5 @@ export default {
 /*.v-menu__content,.theme--light,.menuable__content__active{*/
 /*  display:none !important;*/
 /*}*/
-
-
-@keyframes move-background {
-  from {
-    -webkit-transform: translate3d(0px, 0px, 0px);
-  }
-  to {
-    -webkit-transform: translate3d(1000px, 0px, 0px);
-  }
-}
-@-webkit-keyframes move-background {
-  from {
-    -webkit-transform: translate3d(0px, 0px, 0px);
-  }
-  to {
-    -webkit-transform: translate3d(1000px, 0px, 0px);
-  }
-}
-
-@-moz-keyframes move-background {
-  from {
-    -webkit-transform: translate3d(0px, 0px, 0px);
-  }
-  to {
-    -webkit-transform: translate3d(1000px, 0px, 0px);
-  }
-}
-
-@-webkit-keyframes move-background {
-  from {
-    -webkit-transform: translate3d(0px, 0px, 0px);
-  }
-  to {
-    -webkit-transform: translate3d(1000px, 0px, 0px);
-  }
-}
-
-
-
-.stars {
-  background: black url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/1231630/stars.png) repeat;
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  display: block;
-  z-index: 0;
-}
-
-.twinkling{
-  width:10000px;
-  height: 100%;
-  background: transparent url("https://s3-us-west-2.amazonaws.com/s.cdpn.io/1231630/twinkling.png") repeat;
-  background-size: 1000px 1000px;
-  position: absolute;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  z-index: 2;
-
-  -moz-animation:move-background 70s linear infinite;
-  -ms-animation:move-background 70s linear infinite;
-  -o-animation:move-background 70s linear infinite;
-  -webkit-animation:move-background 70s linear infinite;
-  animation:move-background 70s linear infinite;
-
-}
-
-.clouds{
-  width:10000px;
-  height: 100%;
-  background: transparent url("https://s3-us-west-2.amazonaws.com/s.cdpn.io/1231630/clouds_repeat.png") repeat;
-  background-size: 1000px 1000px;
-  position: absolute;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  z-index: 3;
-
-  -moz-animation:move-background 150s linear infinite;
-  -ms-animation:move-background 150s linear infinite;
-  -o-animation:move-background 150s linear infinite;
-  -webkit-animation:move-background 150s linear infinite;
-  animation:move-background 150s linear infinite;
-}
-img{
-  height: 70vh;
-  width:70vh;
-  position: absolute;
-  z-index: 3;
-  right: 20px;
-}
 
 </style>
