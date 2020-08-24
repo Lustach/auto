@@ -1,15 +1,14 @@
 <template>
   <v-app>
-    <div class="stars"></div>
-    <div class="twinkling"></div>
 <!--    <v-app-bar-->
 <!--      app-->
 <!--      color="primary"-->
 <!--      dark-->
 <!--    >-->
 <!--    </v-app-bar>-->
-    <v-main style="z-index: 3">
-    <router-view></router-view>
+    <v-main>
+      <vue-particles color="#4E77DE" style="position:absolute;width:100%;height:100%;" :particlesNumber="180" :clickEffect="false"></vue-particles>
+      <keep-alive include="SignUpSettings"><router-view></router-view></keep-alive>
     </v-main>
   </v-app>
 </template>
