@@ -21,30 +21,30 @@
                   <v-text-field
                     :disabled="disabledSettings"
                     :rules="rules.fullName"
-                    hide-details="auto"
+
                     label="Введите ваше ФИО"
                     outlined
                     required
                     v-model="fullName"
                   ></v-text-field>
                 </v-col>
-                <v-col class="pb-0" cols="12" md="12">
+                <v-col class="pb-0 pt-1" cols="12" md="12">
                   <!--                  :rules="rules.fullName"-->
                   <v-text-field
                     disabled
-                    hide-details="auto"
+
                     label="Ваш номер телефона"
                     outlined
                     v-model="phoneNumber"
                   ></v-text-field>
                 </v-col>
                 <!--                Comppany-->
-                <v-col class="pb-0" cols="12" md="12">
+                <v-col class="pb-0 pt-1" cols="12" md="12">
                   <!--                  :rules="rules.companyName"-->
                   <v-text-field
                     :disabled="disabledSettings"
                     :rules="rules.companyName"
-                    hide-details="auto"
+
                     label="Введите Название компании"
                     outlined
                     required
@@ -52,12 +52,12 @@
                   ></v-text-field>
                 </v-col>
                 <!--                City-->
-                <v-col class="pb-0" cols="12" md="12">
+                <v-col class="pb-0 pt-1" cols="12" md="12">
                   <!--                  :rules="rules.cityName"-->
                   <v-text-field
                     :disabled="disabledSettings"
                     :rules="rules.cityName"
-                    hide-details="auto"
+
                     label="Введите Город"
                     outlined
                     required
@@ -65,12 +65,12 @@
                   ></v-text-field>
                 </v-col>
                 <!--                Adress-->
-                <v-col class="pb-0" cols="12" md="12">
+                <v-col class="pb-0 pt-1" cols="12" md="12">
                   <!--                  :rules="rules.address"-->
                   <v-text-field
                     :disabled="disabledSettings"
                     :rules="rules.address"
-                    hide-details="auto"
+
                     label="Введите Адрес склада"
                     outlined
                     required
@@ -78,7 +78,7 @@
                   ></v-text-field>
                 </v-col>
                 <!--                auto parts-->
-                <v-col class="pb-0" cols="12" md="12">
+                <v-col class="pb-0 pt-1" cols="12" md="12">
                   <Field :field="carParts" label="Выберите автозапчасти" ref="carParts"></Field>
                 </v-col>
                 <v-col class="pb-0" cols="12" md="12">
@@ -98,7 +98,7 @@
                         </v-btn>
                       </div>
                       <Field :field="i.auto" :iconInItem="true" :key="i.auto.items[j].id" :multiple="false"
-                             @getModel="getModel($event,j)" label="Выберите автомобиль" @clearModelValue="clearModelValue($event,j)">
+                             @clearModelValue="clearModelValue($event,j)" @getModel="getModel($event,j)" label="Выберите автомобиль">
                       </Field>
                       <Field :auto="i.auto" :disabled="true" :field="i.models" :key="i.models[j]" :multiple="true" @getModel="getModel($event,j)" @selectAll="selectAll($event,j)"
                              label="Выберите модели"
@@ -149,7 +149,7 @@ export default {
 		}
 		if (this.$route.meta === 'settings') {
 			try {
-				this.checkbox=true
+				this.checkbox = true
 				this.carMaker.items = (await this.$API.car.maker()).data.slice()
 				const result = (await this.$API.settings.getUser(this.$route.params.id)).data
 				this.fullName = result.name
@@ -157,8 +157,8 @@ export default {
 				this.phoneNumber = result.phone
 				this.cityName = result.city_name
 				this.address = result.address
-        this.buAuto=result.type_detail.used_detail
-        this.newAuto=result.type_detail.new_detail
+				this.buAuto = result.type_detail.used_detail
+				this.newAuto = result.type_detail.new_detail
 				this.carParts.items = result.work_type
 				this.carParts.value = result.work_type.filter(e => e.checked ? e.id : null)
 				// result.car_list
@@ -229,15 +229,15 @@ export default {
 		newAuto: false,
 	}),
 	methods: {
-		clearModelValue(e,index){
-      this.groups[index].models.value=[]
-    },
+		clearModelValue(e, index) {
+			this.groups[index].models.value = []
+		},
 		async submit() {
 			if (this.$refs.form.validate()) {
 				let test = []
 				this.groups.forEach(e => {
 					if (e)
-						test.push(...e.models.value)
+						test.push(...e.models.value.map(e=>e!==""))
 				})
 				const payload = {
 					full_name: this.fullName,
@@ -251,12 +251,17 @@ export default {
 					phone_number: this.phone_number
 				}
 				try {
-					await this.$API.car.addUser(payload)
+					if (this.$route.meta === 'settings') {
+						await this.$API.settings.updateUser(payload)
+					} else {
+						await this.$API.car.addUser(payload)
+					}
 					alert('Регистрация прошла успешно')
-					this.resetForm()
-				} catch {
+					if (this.$route.meta !== 'settings')
+						this.resetForm()
+				} catch (e) {
 					alert('Произошла ошибка')
-					console.error('error')
+					console.error(e, 'error')
 				}
 			}
 		},
@@ -276,11 +281,11 @@ export default {
 			// }
 			this.indexes[fieldIndex] = carId
 			if (this.indexes.length > 0) {
-				console.log(3,fieldIndex,carId)
+				console.log(3, fieldIndex, carId)
 				for (let i = 0; i < this.groups.length; i++) {
 					this.groups[i].auto.items = JSON.parse(JSON.stringify(this.carMaker.items.filter(e => e.id)))
 				}
-			// this.groups[fieldIndex].models.value=[]
+				// this.groups[fieldIndex].models.value=[]
 			}
 			//вернуть
 			// else {

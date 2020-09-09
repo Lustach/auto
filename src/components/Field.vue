@@ -65,7 +65,7 @@
     </div>
     <v-col class="pt-0" cols="12" md="12">
       <v-select :clearable="iconInItem" :disabled="disabled && isEmpty" :items="field.items" :label="label" :multiple="multiple" :rules="[required]"
-                @click="openDialog($event)" @click:clear="callBack()" hide-details="auto" item-text="name"
+                @click="openDialog($event)" @click:clear="callBack()" item-text="name"
                 item-value="id" no-data-text="Нет данных" ref="select" v-model="field.value" @change="clearModelValue($event)">
         <v-list-item @click="toggle" ripple slot="prepend-item" v-if="field.items.length>0 && multiple">
           <v-list-item-action>
