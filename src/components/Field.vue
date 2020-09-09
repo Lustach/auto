@@ -1,55 +1,44 @@
 <template>
-  <div >
-<!--    {{checkArray(field.value)}}-->
-<!--{{tempArr}}temp-->
-<!--    {{field.value}}-->
+  <div>
     <div v-if="multiple">
-      <v-dialog max-width="364" persistent scrollable v-model="dialog">
-        <!--        {{field.value}}-->
-        <!--        :style="{height: field.items.length-15*65+'px'}" don't work-->
-        <v-card color="grey darken-3" height="auto">
-          <!--        <v-card-title class="headline">Use Google's location service?</v-card-title>-->
-
+      <v-dialog v-model="dialog" max-width="364" persistent scrollable>
+        <v-card height="auto">
           <v-card-text class="px-2 pt-3 pb-0">
-            <v-list color="grey darken-3" dark v-if="field.items.length>0">
-              <v-list-item @click="toggle" ripple>
+            <v-list v-if="field.items.length>0">
+              <v-list-item ripple @click="toggle">
                 <v-list-item-title>Выбрать все</v-list-item-title>
                 <v-list-item-action>
-                  <v-icon :color="field.value.length > 0 ? 'indigo lighten-4' : ''">{{icon}}</v-icon>
+                  <v-icon :color="field.value.length > 0 ? 'indigo lighten-4' : ''">{{ icon }}</v-icon>
                 </v-list-item-action>
               </v-list-item>
             </v-list>
-            <v-card-title class="d-flex justify-center" v-if="field.items.length===0">
+            <v-card-title v-if="field.items.length===0" class="d-flex justify-center">
               <span class="white--text">
               Нет данных</span>
 
             </v-card-title>
             <v-list
-              color="grey darken-3"
-              dark
-              flat
-              subheader
-              two-line
+                flat
+                subheader
+                two-line
             >
               <v-list-item-group
-                multiple
+                  multiple
               >
-                <v-list-item :key="j" @change="change(i.id,j)" v-for="(i,j) in field.items">
+                <v-list-item v-for="(i,j) in field.items" :key="j" @change="change(i.id,j)">
                   <template v-slot:default>
                     <v-list-item-content>
-                      <v-list-item-title>{{i.name}}</v-list-item-title>
-                      <!--                    <v-list-item-subtitle>Allow notifications</v-list-item-subtitle>-->
+                      <v-list-item-title class="d-flex">
+                        <v-img :src="i.link" height="25px" max-width="25px"></v-img>
+                        <span style="white-space: pre"> {{ i.name }}</span>
+                      </v-list-item-title>
                     </v-list-item-content>
                     <v-list-item-action>
-                      <!--                      {{active}}-->
-                      <!--                      {{field.value[j]}}-->
                       <v-checkbox
-                        :input-value="field.value[j]"
-                        color="primary"
+                          :input-value="field.value[j]"
+                          color="primary"
                       ></v-checkbox>
                     </v-list-item-action>
-
-
                   </template>
                 </v-list-item>
               </v-list-item-group>
@@ -57,37 +46,37 @@
           </v-card-text>
           <v-card-actions class="pb-1 pt-0">
             <v-spacer></v-spacer>
-            <v-btn @click="cancel()" color="primary" text>Отмена</v-btn>
-            <v-btn @click="accept()" color="primary" text>Ок</v-btn>
+            <v-btn color="primary" text @click="cancel()">Отмена</v-btn>
+            <v-btn color="primary" text @click="accept()">Ок</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
     </div>
-    <v-col class="pt-0" cols="12" md="12">
-      <v-select :clearable="iconInItem" :disabled="disabled && isEmpty" :items="field.items" :label="label" :multiple="multiple" :rules="[required]"
-                @click="openDialog($event)" @click:clear="callBack()" item-text="name"
-                item-value="id" no-data-text="Нет данных" ref="select" v-model="field.value" @change="clearModelValue($event)">
-        <v-list-item @click="toggle" ripple slot="prepend-item" v-if="field.items.length>0 && multiple">
+    <v-col class="pt-0 pb-0" cols="12" md="12">
+      <v-select ref="select" v-model="field.value" :clearable="iconInItem" :disabled="disabled && isEmpty" :items="field.items" :label="label"
+                :multiple="multiple" :rules="[required]" item-text="name"
+                item-value="id" no-data-text="Нет данных" @click="openDialog($event)">
+        <v-list-item v-if="field.items.length>0 && multiple" slot="prepend-item" ripple @click="toggle">
           <v-list-item-action>
-            <v-icon :color="field.value.length > 0 ? 'indigo darken-4' : ''">{{icon}}</v-icon>
+            <v-icon :color="field.value.length > 0 ? 'indigo darken-4' : ''">{{ icon }}</v-icon>
           </v-list-item-action>
           <v-list-item-title>Выбрать все</v-list-item-title>
         </v-list-item>
-        <v-divider class="mt-2" slot="prepend-item" v-if="field.items.length>0 && multiple"/>
+        <v-divider v-if="field.items.length>0 && multiple" slot="prepend-item" class="mt-2"/>
         <template v-if="iconInItem" v-slot:item="{ item}">
           <div style="display: flex;align-items: center">
-            <v-img :src="item.link" class="mr-1" height="25px" v-if="item.id>0" width="25px"></v-img>
+            <v-img v-if="item.id>0" :src="item.link" class="mr-1" height="25px" width="25px"></v-img>
             <span>{{ item.name }}</span>
           </div>
         </template>
         <template v-slot:selection="{ item, index }">
           <div style="display: flex;align-items: center">
-            <v-img :src="item.link" class="mr-1" height="25px" v-if="iconInItem && index<2 && item.id>0" width="25px"></v-img>
-            <span style="white-space: pre" v-if="index===0 || index===1">
-            <span>{{ item.name }}</span>
-            <span v-if="index<field.value.length-1 && index !==1">, </span>
+            <v-img v-if="iconInItem && index<1 && item.id>0" :src="item.link" class="mr-1" height="25px" width="25px"></v-img>
+            <span v-if="index===0" style="white-space: pre">
+            <span>{{ item.name }} </span>
+              <!--            <span v-if="index<field.value.length-1 && index !==1">, </span>-->
             </span>
-            <span class="grey--text caption" v-if="index === 2 && item!==''">(+ ещё {{ checkArray-2}})</span>
+            <span v-if="index === 1 && item!==''" class="grey--text caption">(+ ещё {{ checkArray - 1 }})</span>
             <!--            <span class="grey&#45;&#45;text caption" v-if="index === 2 && item!==''">(+ ещё {{ field.value.length - 2 }})</span>-->
           </div>
         </template>
@@ -95,175 +84,127 @@
     </v-col>
   </div>
 </template>
-
 <script>
 export default {
-	rules: [
-		v => !!v || 'Не может быть пустым',
-		v => (v && v.length > 0) || 'Не может быть пустым'
-	],
-	name: "Group",
-	props: {
-		model: {},
-		field: {
-			items: [],
-			value: [],
-		},
-		label: {
-			required: true,
-			default: '',
-			type: String,
-		},
-		iconInItem: {
-			default: false
-		},
-		disabled: {
-			default: false,
-		},
-		auto: {
-			type: Object,
-			default: () => {},
-		},
-		multiple: {
-			default: true
-		},
-		// eslint-disable-next-line vue/require-prop-type-constructor
-		itemText: '',
-		// eslint-disable-next-line vue/require-prop-type-constructor
-		itemValue: '',
-	},
-	mounted() {
-	},
-	data: () => ({
-		dialog: false,
-		tempArr: [],//for cancel or accept methods /
-	}),
-	methods: {
-		clearModelValue(e){
-      this.$emit('clearModelValue',e)
-      // this.field.value=[]
+  rules: [
+    v => !!v || 'Не может быть пустым',
+    v => (v && v.length > 0) || 'Не может быть пустым'
+  ],
+  name: "Group",
+  props: {
+    model: {},
+    field: {
+      items: [],
+      value: [],
     },
-		change(id, index) {
-			this.field.value[index] ? this.$set(this.field.value, index, '') : this.$set(this.field.value, index, id)
-			// this.field.value[index]=id
-		},
-		cancel() {
-			// console.log(this.tempArr)
-			// this.field.value = []
-			this.dialog = false
-			this.field.value = this.tempArr.slice()
-			// this.field.value.filter((e) => {
-			// 	console.log(this.tempArr.indexOf(e),'E')
-			// 	return this.tempArr.indexOf(e) > 0
-			// })
-		},
-		accept() {
-			this.tempArr = this.field.value.slice()
-			this.dialog = false
-			this.$forceUpdate()
-		},
-		openDialog() {
-			// костыль, но работает
-			// this.$refs.select.$children[1].styles.display='none'
-			// console.log(this.$refs.select.$children[1])
-			if (this.multiple)
-				// setTimeout(() => {
-				// 	this.$refs.select.$children[1].$refs.content.style.display = 'none'
-				// }, 155)
-				// this.$refs.select.$children[1].$el.style['display']='none'
-				if (this.field.items.length > 0)
-					this.multiple ? this.dialog = true : ''
-			// document.querySelector('.v-menu__content').style.display='none'
-		},
-		callBack() {
-			console.log('callBack')
-			this.$emit('getModel')
-		},
-		required(value) {
-			if (value instanceof Array && value.length === 0) {
-				return 'Не может быть пустым'
-			}
-			if (value === 0) {
-				return !value
-			}
-			return !!value || 'Не может быть пустым'
-		},
-		toggle() {
-			this.$nextTick(() => {
-				console.log('toggle')
-				if (this.selectedAllGroup) {
-					this.field.value = []
-				} else {
-					this.field.value = this.field.items.map(e => {return e.id}).slice()
-				}
-			})
-		},
-	},
-	computed: {
-		checkArray() {
-			let length = 0
-			for (let i = 0; i < this.field.value.length; i++) {
-				if (this.field.value[i]) length++
-			}
-			return length
-		},
-		tr() {
-			return this.field
-		},
-		test() {
-			if (this.model) {
-				return this.model
-			} else {
-				return this.field.value
-			}
-		},
-		selectedAllGroup() {
-			return this.field.value.length === this.field.items.length
-		},
-		selectedSomeGroup() {
-			return this.field.value.length > 0 && !this.selectedAllGroup
-		},
-		icon() {
-			if (this.selectedAllGroup) return 'mdi-close-box'
-			if (this.selectedSomeGroup) return 'mdi-minus-box'
-			return 'mdi-checkbox-blank-outline'
-		},
-		isEmpty: vm => {
-			if (vm.disabled) {
-				if (Array.isArray(vm.auto.value) && vm.auto.value.length !== 0) {
-					vm.$API.car.model(0)
-					return false
-				}
-				if (typeof vm.auto.value === "number") {
-					// // todo id
-					if (vm.auto.value === 0) {
-						vm.$emit('selectAll', vm)
-						return true
-					} else {
-						vm.$emit('getModel', vm.auto.value)
-						return false
-					}
-				} else
-					return true
-			}
-		}
-	},
-	watch: {
-		dialog: function () {
-			if (this.dialog) {
-				// window.focus()
-				// document.querySelector('.v-menu__content').style.display='none'
-				// console.log(document.querySelector('.v-menu__content'))
-				// this.$refs.select.$refs.menu.$el.classList.add('.v-menu__content')
-				// console.log(this.$refs.select.$refs.menu.$el)
-				let timerId = setInterval(() => {
-					// this.$refs.select.$refs.menu.$refs.style.display = 'none'
-					this.$refs.select.$children[1].$refs.content.style.display = 'none'
-				}, 100)
-				setTimeout(() => { clearInterval(timerId) }, 2000);
-			}
-		}
-	},
+    label: {
+      required: true,
+      default: '',
+      type: String,
+    },
+    iconInItem: {
+      default: false
+    },
+    disabled: {
+      default: false,
+    },
+    multiple: {
+      default: true
+    },
+  },
+  mounted() {
+  },
+  data: () => ({
+    dialog: false,
+    tempArr: [],//for cancel or accept methods /
+  }),
+  methods: {
+    change(id, index) {
+      this.field.value[index] ? this.$set(this.field.value, index, '') : this.$set(this.field.value, index, id)
+    },
+    cancel() {
+      this.dialog = false
+      this.field.value = this.tempArr.slice()
+    },
+    accept() {
+      this.tempArr = this.field.value.slice()
+      this.dialog = false
+      this.$forceUpdate()
+    },
+    openDialog() {
+      if (this.multiple)
+        if (this.field.items.length > 0)
+          this.multiple ? this.dialog = true : ''
+    },
+    required(value) {
+      if (value instanceof Array && value.length === 0) {
+        return 'Не может быть пустым'
+      }
+      if (value === 0) {
+        return !value
+      }
+      return !!value || 'Не может быть пустым'
+    },
+    toggle() {
+      this.$nextTick(() => {
+        if (this.selectedAllGroup) {
+          this.field.value = []
+        } else {
+          this.field.value = this.field.items.map(e => {return e.id}).slice()
+        }
+      })
+    },
+  },
+  computed: {
+    checkArray() {
+      let length = 0
+      for (let i = 0; i < this.field.value.length; i++) {
+        if (this.field.value[i]) length++
+      }
+      return length
+    },
+    selectedAllGroup() {
+      return this.field.value.length === this.field.items.length
+    },
+    selectedSomeGroup() {
+      return this.field.value.length > 0 && !this.selectedAllGroup
+    },
+    icon() {
+      if (this.selectedAllGroup) return 'mdi-close-box'
+      if (this.selectedSomeGroup) return 'mdi-minus-box'
+      return 'mdi-checkbox-blank-outline'
+    },
+    isEmpty: vm => {
+      if (vm.disabled) {
+        if (Array.isArray(vm.auto.value) && vm.auto.value.length !== 0) {
+          vm.$API.car.model(0)
+          return false
+        }
+        if (typeof vm.auto.value === "number") {
+          console.log('hi')
+          // // todo id
+          if (vm.auto.value === 0) {
+            vm.$emit('selectAll', vm)
+            return true
+          } else {
+            vm.$emit('getModel', vm.auto.value)
+            return false
+          }
+        } else
+          return true
+      }
+    }
+  },
+  watch: {
+    dialog: function () {
+      if (this.dialog) {
+        let timerId = setInterval(() => {
+          this.$refs.select.$children[2].$refs.content.style.display = 'none'
+        }, 100)
+        setTimeout(() => { clearInterval(timerId) }, 1000)
+      }
+    }
+  },
 }
 </script>
 
@@ -275,12 +216,5 @@ export default {
 .v-list-item__title, .v-list-item__subtitle {
   white-space: normal !important;
 }
-
-/*.v-menu__content{*/
-/*  display:none !important;*/
-/*}*/
-/*.v-menu__content,.theme--light,.menuable__content__active{*/
-/*  display:none !important;*/
-/*}*/
 
 </style>
