@@ -72,11 +72,10 @@
                   ></v-text-field>
                 </v-col>
                 <v-col class="pb-0 pt-1" cols="12" md="12">
-                  {{carMaker}}
-                  <Field ref="carMaker" :field="carMaker" :iconInItem="true" label="Выберите марки"></Field>
+                  <Field ref="status" :field="status" :multiple="false" label="Ваша должность"></Field>
                 </v-col>
                 <v-col class="pb-0 pt-1" cols="12" md="12">
-                  <Field ref="posts" :field="post" :multiple="false" label="Ваша должность"></Field>
+                  <Field ref="carMaker" :field="carMaker" :iconInItem="true" label="Выберите марки"></Field>
                 </v-col>
                 <v-col class="pb-0 pt-1 px-6" cols="12" md="12">
                   <v-textarea v-model="about" :rules="rules.about" auto-grow label="Откуда о нас узнали" no-resize row-height="24px" rows="1"></v-textarea>
@@ -108,9 +107,10 @@ export default {
   },
   async mounted() {
     try {
-      await Promise.all([this.$API.car.maker(), this.$API.car.phone(this.$route.params.id)]).then(values => {
+      await Promise.all([this.$API.car.maker(), this.$API.car.phone(this.$route.params.id),this.$API.status.directorStatus()]).then(values => {
         this.carMaker.items = values[0].data.slice()
         this.phoneNumber = values[1].data.phone
+        this.status.items = values[2].data
       })
     } catch (e) {
       console.error(e, 'error')
@@ -133,7 +133,7 @@ export default {
     address: '',
     carMaker: { items: [], value: [] },
     carMakerLength: 0,
-    post: { items: [{ id: 1, name: 'Генеральный директор/собственник' }, { id: 2, name: 'Менеджер по продажам' }], value: [], },
+    status: { items: [{ id: 1, name: 'Генеральный директор/собственник' }, { id: 2, name: 'Менеджер по продажам' }], value: [], },
     about: '',
     checkbox: false,
     dialog: false,
@@ -150,7 +150,7 @@ export default {
           state_auto: { buAuto: this.buAuto, newAuto: this.newAuto },
           phone_number: this.phone_number,
           about: this.about,
-          post: this.post,
+          status: this.status,
         }
         try {
           await this.$API.car.addUser(payload)
