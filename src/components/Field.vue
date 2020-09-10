@@ -29,7 +29,7 @@
                   <template v-slot:default>
                     <v-list-item-content>
                       <v-list-item-title class="d-flex">
-                        <v-img :src="i.link" height="25px" max-width="25px"></v-img>
+                        <v-img :src="i.link" height="18px" max-width="25px"></v-img>
                         <span style="white-space: pre"> {{ i.name }}</span>
                       </v-list-item-title>
                     </v-list-item-content>
@@ -53,7 +53,7 @@
       </v-dialog>
     </div>
     <v-col class="pt-0 pb-0" cols="12" md="12">
-      <v-select ref="select" v-model="field.value" :clearable="iconInItem" :disabled="disabled && isEmpty" :items="field.items" :label="label"
+      <v-select ref="select" v-model="field.value" :clearable="iconInItem" :disabled="disabled" :items="field.items" :label="label"
                 :multiple="multiple" :rules="[required]" item-text="name"
                 item-value="id" no-data-text="Нет данных" @click="openDialog($event)">
         <v-list-item v-if="field.items.length>0 && multiple" slot="prepend-item" ripple @click="toggle">
@@ -65,15 +65,15 @@
         <v-divider v-if="field.items.length>0 && multiple" slot="prepend-item" class="mt-2"/>
         <template v-if="iconInItem" v-slot:item="{ item}">
           <div style="display: flex;align-items: center">
-            <v-img v-if="item.id>0" :src="item.link" class="mr-1" height="25px" width="25px"></v-img>
+            <v-img v-if="item.id>0" :src="item.link" class="mr-1" height="18px" width="25px"></v-img>
             <span>{{ item.name }}</span>
           </div>
         </template>
         <template v-slot:selection="{ item, index }">
           <div style="display: flex;align-items: center">
-            <v-img v-if="iconInItem && index<1 && item.id>0" :src="item.link" class="mr-1" height="25px" width="25px"></v-img>
+            <v-img v-if="iconInItem && index<1 && item.id>0" :src="item.link" class="mr-1" height="18px" width="25px"></v-img>
             <span v-if="index===0" style="white-space: pre">
-            <span>{{ item.name }} </span>
+            <span>{{ item.name }}</span>
               <!--            <span v-if="index<field.value.length-1 && index !==1">, </span>-->
             </span>
             <span v-if="index === 1 && item!==''" class="grey--text caption">(+ ещё {{ checkArray - 1 }})</span>
@@ -135,6 +135,8 @@ export default {
       if (this.multiple)
         if (this.field.items.length > 0)
           this.multiple ? this.dialog = true : ''
+          this.tempArr=this.field.value.slice()
+
     },
     required(value) {
       if (value instanceof Array && value.length === 0) {
@@ -174,26 +176,26 @@ export default {
       if (this.selectedSomeGroup) return 'mdi-minus-box'
       return 'mdi-checkbox-blank-outline'
     },
-    isEmpty: vm => {
-      if (vm.disabled) {
-        if (Array.isArray(vm.auto.value) && vm.auto.value.length !== 0) {
-          vm.$API.car.model(0)
-          return false
-        }
-        if (typeof vm.auto.value === "number") {
-          console.log('hi')
-          // // todo id
-          if (vm.auto.value === 0) {
-            vm.$emit('selectAll', vm)
-            return true
-          } else {
-            vm.$emit('getModel', vm.auto.value)
-            return false
-          }
-        } else
-          return true
-      }
-    }
+    // isEmpty: vm => {
+    //   if (vm.disabled) {
+    //     if (Array.isArray(vm.auto.value) && vm.auto.value.length !== 0) {
+    //       vm.$API.car.model(0)
+    //       return false
+    //     }
+    //     if (typeof vm.auto.value === "number") {
+    //       console.log('hi')
+    //       // // todo id
+    //       if (vm.auto.value === 0) {
+    //         vm.$emit('selectAll', vm)
+    //         return true
+    //       } else {
+    //         vm.$emit('getModel', vm.auto.value)
+    //         return false
+    //       }
+    //     } else
+    //       return true
+    //   }
+    // }
   },
   watch: {
     dialog: function () {
