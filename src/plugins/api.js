@@ -22,10 +22,10 @@ const API = {
 	status:{
 		directorStatus:()=>axios.get(`${BASE_URL}/director_status`)
 	},
-	// settings:{
-	// 	getUser:(id)=>axios.get(`${BASE_URL}/get_company_info?id=${id}`),
-	// 	updateUser:(data)=>axios.post(`${BASE_URL}/company-update`, data),
-	// },
+	settings:{
+		getUser:(id)=>axios.get(`${BASE_URL}/get_company_info?id=${id}`),
+		updateUser:(data)=>axios.post(`${BASE_URL}/company-update`, data),
+	},
 	// record: {
 		// getData: () => axios.get(`${BASE_URL}/api/records`)
 		// chart: {
