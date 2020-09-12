@@ -9,7 +9,8 @@
             <div class="d-inline-flex justify-center">
               <v-img height="50" src="@/../public/11.png" width="50"/>
             </div>
-            <div class="headline text--primary">Регистрация поставщика двигателей</div>
+            <div class="headline text--primary" v-if="$route.meta === 'registration'">Регистрация поставщика двигателей</div>
+            <div class="headline text--primary" v-else>Настройки аккаунта</div>
             <p class="mb-1" v-if="$route.meta === 'registration'">Введите данные вашей компании, чтобы получить доступ к заказам.</p>
             <p class="mb-1" v-else>Отредактируйте данные вашей компании</p>
             <!--            ref="form" v-model="valid"-->
