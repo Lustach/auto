@@ -132,11 +132,12 @@ export default {
       this.$forceUpdate()
     },
     openDialog() {
-      if (this.multiple)
-        if (this.field.items.length > 0)
+      if (this.multiple) {
+        if (this.field.items.length > 0) {
           this.multiple ? this.dialog = true : ''
-          this.tempArr=this.field.value.slice()
-
+          this.tempArr = this.field.value.slice()
+        }
+      }
     },
     required(value) {
       if (value instanceof Array && value.length === 0) {

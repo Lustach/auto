@@ -9,8 +9,9 @@
             <div class="d-inline-flex justify-center">
               <v-img height="50" src="@/../public/11.png" width="50"/>
             </div>
-            <div class="headline text--primary">Регистрация поставщика</div>
-            <p class="mb-1">Введите данные вашей компании, чтобы получить доступ к заказам.</p>
+            <div class="headline text--primary">Регистрация поставщика двигателей</div>
+            <p class="mb-1" v-if="$route.meta === 'registration'">Введите данные вашей компании, чтобы получить доступ к заказам.</p>
+            <p class="mb-1" v-else>Отредактируйте данные вашей компании</p>
             <!--            ref="form" v-model="valid"-->
             <v-form ref="form" v-model="valid">
               <v-row>
@@ -72,7 +73,8 @@
                   ></v-text-field>
                 </v-col>
                 <v-col class="pb-0 pt-1" cols="12" md="12">
-                  <Field ref="status" :disabled="disabledSettings" :field="status" :multiple="false" label="Ваша должность"></Field>
+                  <Field ref="status" :disabled="disabledSettings" :field="status" :multiple="false" label="Ваша должность" v-if="$route.meta==='registration'"></Field>
+                  <v-text-field class="px-3" v-else :disabled="disabledSettings" v-model="status.items.name" ></v-text-field>
                 </v-col>
                 <v-col class="pb-0 pt-1" cols="12" md="12">
                   <Field ref="carMaker" :field="carMaker" :iconInItem="true" label="Выберите марки"></Field>
@@ -108,7 +110,7 @@ export default {
   async mounted() {
     if (this.$route.meta === 'registration') {
       try {
-        await Promise.all([this.$API.car.maker(), this.$API.car.phone(this.$route.params.id), this.$API.status.directorStatus()]).then(values => {
+        await Promise.all([this.$API.car.maker(), this.$API.settings.getUser(this.$route.params.id), this.$API.status.directorStatus()]).then(values => {
           this.carMaker.items = values[0].data.slice()
           this.phoneNumber = values[1].data.phone
           this.status.items = values[2].data
@@ -119,14 +121,20 @@ export default {
     }
     if (this.$route.meta === 'settings') {
       try {
-        this.carMaker.items = (await this.$API.car.maker()).data.slice()
-        const result = (await this.$API.settings.getUser(this.$route.params.id)).data
+        // this.carMaker.items = (await this.$API.car.maker()).data.slice()
+        // await Promise.all([this.$API.getCompanyInfo(this.$route.params.id),])
+        this.checkbox = true
+        const result = (await this.$API.settings.getCompanyInfo(this.$route.params.id)).data
         this.fullName = result.name
         this.companyName = result.name
         this.phoneNumber = result.phone
         this.cityName = result.city_name
         this.address = result.address
-        this.status = result.status
+        this.carMaker.items = result.car_list
+        this.carMaker.value = result.car_list.map(e => e.checked === true ? e.id : '')
+        this.status.items={}
+        this.status.items= { id: 1, name: result.director_status }
+        this.status.value = this.status.items.name
       } catch (e) {
         console.error(e, 'error')
       }
@@ -147,7 +155,8 @@ export default {
     cityName: '',
     address: '',
     carMaker: { items: [], value: [] },
-    status: { items: [{ id: 1, name: 'Генеральный директор/собственник' }, { id: 2, name: 'Менеджер по продажам' }], value: [], },
+    status: { items: [], value: [], },
+    // status: { items: [{ id: 1, name: 'Генеральный директор/собственник' }, { id: 2, name: 'Менеджер по продажам' }], value: [], },
     about: '',
     checkbox: false,
     dialog: false,
@@ -161,19 +170,19 @@ export default {
           city_name: this.cityName,
           address: this.address,
           user_id: this.$route.params.id,
-          state_auto: { buAuto: this.buAuto, newAuto: this.newAuto },
           phone_number: this.phone_number,
-          about: this.about,
-          status: this.status,
+          status: this.status.value,
+          car_list: this.carMaker.value.filter(e=>e!=="")
         }
         try {
           if (this.$route.meta === 'settings') {
             await this.$API.settings.updateUser(payload)
           } else {
+            payload.about = this.about
             await this.$API.car.addUser(payload)
           }
           alert('Регистрация прошла успешно')
-          this.resetForm()
+          this.$route.meta === 'registration' ? this.resetForm() : ''
         } catch (e) {
           alert('Произошла ошибка')
           console.error(e, 'error')
