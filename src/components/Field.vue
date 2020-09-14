@@ -157,6 +157,13 @@ export default {
         }
       })
     },
+    isEmpty(obj) {
+      for (let key in obj) {
+        // если тело цикла начнет выполняться - значит в объекте есть свойства
+        return false
+      }
+      return true
+    }
   },
   computed: {
     checkArray() {
@@ -199,10 +206,17 @@ export default {
     // }
   },
   watch: {
+    // todo ну тут костыль на костыле блядь!!!!!!
+    // todo я просто в шоке на хуй...
     dialog: function () {
       if (this.dialog) {
         let timerId = setInterval(() => {
-          this.$refs.select.$children[2].$refs.content.style.display = 'none'
+          if (this.$refs.select.$children[1].$refs && !this.isEmpty(this.$refs.select.$children[1].$refs)){
+            this.$refs.select.$children[1].$refs.content.style.display = 'none'
+          }
+          if (this.$refs.select.$children[2].$refs && !this.isEmpty(this.$refs.select.$children[2].$refs)) {
+            this.$refs.select.$children[2].$refs.content.style.display = 'none'
+          }
         }, 100)
         setTimeout(() => { clearInterval(timerId) }, 1000)
       }

@@ -30,6 +30,7 @@
                 </v-col>
                 <v-col class="pb-0 pt-1" cols="12" md="12">
                   <!--                  :rules="rules.fullName"-->
+                  {{phoneNumber}}
                   <v-text-field
                       v-model="phoneNumber"
                       disabled
@@ -74,6 +75,9 @@
                   ></v-text-field>
                 </v-col>
                 <v-col class="pb-0 pt-1" cols="12" md="12">
+                  <Field :field="carParts" label="Выберите автозапчасти" ref="carParts"></Field>
+                </v-col>
+                <v-col class="pb-0 pt-1" cols="12" md="12">
                   <Field ref="status" :disabled="disabledSettings" :field="status" :multiple="false" label="Ваша должность" v-if="$route.meta==='registration'"></Field>
                   <v-text-field class="px-3" v-else :disabled="disabledSettings" v-model="status.items.name" ></v-text-field>
                 </v-col>
@@ -109,6 +113,7 @@ export default {
     // 'Field': () => import('@/components/Field.vue')
   },
   async mounted() {
+    this.carParts.items = ( await this.$API.car.parts()).data.slice()
     if (this.$route.meta === 'registration') {
       try {
         await Promise.all([this.$API.car.maker(), this.$API.settings.getUser(this.$route.params.id), this.$API.status.directorStatus()]).then(values => {
@@ -122,7 +127,7 @@ export default {
     }
     if (this.$route.meta === 'settings') {
       try {
-        // this.carMaker.items = (await this.$API.car.maker()).data.slice()
+        this.carMaker.items = ( await this.$API.car.maker()).data.slice()
         // await Promise.all([this.$API.getCompanyInfo(this.$route.params.id),])
         this.checkbox = true
         const result = (await this.$API.settings.getCompanyInfo(this.$route.params.id)).data
@@ -140,6 +145,9 @@ export default {
         console.error(e, 'error')
       }
     }
+    this.$nextTick(function () {
+      this.$refs.carParts.accept()
+    })
   },
   data: () => ({
     valid: true,
@@ -157,6 +165,7 @@ export default {
     address: '',
     carMaker: { items: [], value: [] },
     status: { items: [], value: [], },
+    carParts: { items: [], value: [] },
     // status: { items: [{ id: 1, name: 'Генеральный директор/собственник' }, { id: 2, name: 'Менеджер по продажам' }], value: [], },
     about: '',
     checkbox: false,
@@ -170,13 +179,16 @@ export default {
           company_name: this.companyName,
           city_name: this.cityName,
           address: this.address,
-          user_id: this.$route.params.id,
-          phone_number: this.phone_number,
+          user_token: this.$route.params.id,
+          phone_number: this.phoneNumber,
           status: this.status.value,
-          car_list: this.carMaker.value.filter(e=>e!=="")
+          car_list: this.carMaker.value.filter(e=>e!==""),
+          wt_list: this.carParts.value.filter(e => e),
         }
         try {
           if (this.$route.meta === 'settings') {
+            delete payload.user_token
+            payload.company_token = this.$route.params.id
             await this.$API.settings.updateUser(payload)
           } else {
             payload.about = this.about

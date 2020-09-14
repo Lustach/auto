@@ -17,6 +17,7 @@ const API = {
 		maker:()=>axios.get(`http://195.69.187.153:8080/api/v1/car_maker`),
 		model:(id)=>axios.get(`${BASE_URL}/car_model?carmaker_id=${id}`),
 		addUser:(data)=>axios.post(`http://195.69.187.153:8080/api/v1/company-add`, data),
+		parts:()=>axios.get(`${BASE_URL}/work_type`),
 		phone:(id)=>axios.get(`${BASE_URL}/get_user?user_id=${id}`),
 	},
 	status:{

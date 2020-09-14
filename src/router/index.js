@@ -6,14 +6,14 @@ Vue.use(VueRouter)
 
 const routes = [
 	{
-		path: '/:id',
+		path: '/token=:id',
 		name: 'SignUp',
 		// component: () => import('../views/SignUp.vue'),
 		meta: 'registration',
 		component: SignUp
 	},
 	{
-		path: '/settings/:id',
+		path: '/settings/token=:id',
 		name: 'SignUpSettings',
     meta: 'settings',
 		component: SignUp
