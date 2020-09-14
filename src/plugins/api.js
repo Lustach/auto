@@ -9,24 +9,25 @@ import axios from 'axios'
 // 	}
 // })
 
-const BASE_URL = 'http://195.69.187.72:8080/api/v1'
+// const BASE_URL = 'http://195.69.187.72:8080/api/v1'
+const BASE_URL = 'http://195.69.187.153:8080/api/v1'
 // const token = process.env.VUE_APP_KEY
 //смотреть в экспорт!!
 const API = {
 	car:{
-		maker:()=>axios.get(`http://195.69.187.153:8080/api/v1/car_maker`),
+		maker:()=>axios.get(`${BASE_URL}/api/v1/car_maker`),
 		model:(id)=>axios.get(`${BASE_URL}/car_model?carmaker_id=${id}`),
-		addUser:(data)=>axios.post(`http://195.69.187.153:8080/api/v1/company-add`, data),
+		addUser:(data)=>axios.post(`${BASE_URL}/api/v1/company-add`, data),
 		parts:()=>axios.get(`${BASE_URL}/work_type`),
 		phone:(id)=>axios.get(`${BASE_URL}/get_user?user_id=${id}`),
 	},
 	status:{
-		directorStatus:()=>axios.get(`http://195.69.187.153:8080/api/v1/director_status`)
+		directorStatus:()=>axios.get(`${BASE_URL}/api/v1/director_status`)
 	},
 	settings:{
-		getUser:(id)=>axios.get(`http://195.69.187.153:8080/api/v1/get_user?token=${id}`),
-		getCompanyInfo:(id)=>axios.get(`http://195.69.187.153:8080/api/v1/get_company_info?token=${id}`),
-		updateUser:(data)=>axios.post(`http://195.69.187.153:8080/api/v1/company-update`, data),
+		getUser:(id)=>axios.get(`${BASE_URL}/api/v1/get_user?token=${id}`),
+		getCompanyInfo:(id)=>axios.get(`${BASE_URL}/api/v1/get_company_info?token=${id}`),
+		updateUser:(data)=>axios.post(`${BASE_URL}/api/v1/company-update`, data),
 	},
 	// record: {
 		// getData: () => axios.get(`${BASE_URL}/api/records`)
