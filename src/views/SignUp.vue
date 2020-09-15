@@ -9,10 +9,10 @@
             <div class="d-inline-flex justify-center">
               <v-img height="50" src="@/../public/11.png" width="50"/>
             </div>
-            <div class="headline text--primary" v-if="$route.meta === 'registration'">Регистрация поставщика двигателей</div>
-            <div class="headline text--primary" v-else>Настройки аккаунта</div>
-            <p class="mb-1" v-if="$route.meta === 'registration'">Введите данные вашей компании, чтобы получить доступ к заказам.</p>
-            <p class="mb-1" v-else>Отредактируйте данные вашей компании</p>
+            <div v-if="$route.meta === 'registration'" class="headline text--primary">Регистрация поставщика двигателей</div>
+            <div v-else class="headline text--primary">Настройки аккаунта</div>
+            <p v-if="$route.meta === 'registration'" class="mb-1">Введите данные вашей компании, чтобы получить доступ к заказам.</p>
+            <p v-else class="mb-1">Отредактируйте данные вашей компании</p>
             <!--            ref="form" v-model="valid"-->
             <v-form ref="form" v-model="valid">
               <v-row>
@@ -30,7 +30,6 @@
                 </v-col>
                 <v-col class="pb-0 pt-1" cols="12" md="12">
                   <!--                  :rules="rules.fullName"-->
-                  {{phoneNumber}}
                   <v-text-field
                       v-model="phoneNumber"
                       disabled
@@ -75,13 +74,9 @@
                   ></v-text-field>
                 </v-col>
                 <v-col class="pb-0 pt-1" cols="12" md="12">
-                  <Field :field="carParts" label="Выберите автозапчасти" ref="carParts"></Field>
-                </v-col>
-                <v-col class="pb-0 pt-1" cols="12" md="12">
-                  <Field ref="status" :disabled="disabledSettings" :field="status" :multiple="false" label="Ваша должность" v-if="$route.meta==='registration'"></Field>
-                  <v-text-field class="px-3" v-else :disabled="disabledSettings" v-model="status.items.name" ></v-text-field>
-                </v-col>
-                <v-col class="pb-0 pt-1" cols="12" md="12">
+                  <Field v-if="$route.meta==='registration'" ref="status" :disabled="disabledSettings" :field="status" :multiple="false" label="Ваша должность"></Field>
+                  <v-text-field v-else v-model="status.items.name" :disabled="disabledSettings" class="px-3 pt-0"></v-text-field>
+                  <Field ref="carParts" :field="carParts" label="Выберите автозапчасти"></Field>
                   <Field ref="carMaker" :field="carMaker" :iconInItem="true" label="Выберите марки"></Field>
                 </v-col>
                 <v-col v-if="!disabledSettings" class="pb-0 pt-1 px-6" cols="12" md="12">
@@ -113,13 +108,14 @@ export default {
     // 'Field': () => import('@/components/Field.vue')
   },
   async mounted() {
-    this.carParts.items = ( await this.$API.car.parts()).data.slice()
     if (this.$route.meta === 'registration') {
       try {
-        await Promise.all([this.$API.car.maker(), this.$API.settings.getUser(this.$route.params.id), this.$API.status.directorStatus()]).then(values => {
+        await Promise.all([this.$API.car.maker(), this.$API.settings.getUser(this.$route.params.id),
+          this.$API.status.directorStatus(), this.$API.car.parts()]).then(values => {
           this.carMaker.items = values[0].data.slice()
           this.phoneNumber = values[1].data.phone
           this.status.items = values[2].data
+          this.carParts.items = values[3].data.slice()
         })
       } catch (e) {
         console.error(e, 'error')
@@ -127,8 +123,6 @@ export default {
     }
     if (this.$route.meta === 'settings') {
       try {
-        this.carMaker.items = ( await this.$API.car.maker()).data.slice()
-        // await Promise.all([this.$API.getCompanyInfo(this.$route.params.id),])
         this.checkbox = true
         const result = (await this.$API.settings.getCompanyInfo(this.$route.params.id)).data
         this.fullName = result.name
@@ -138,9 +132,11 @@ export default {
         this.address = result.address
         this.carMaker.items = result.car_list
         this.carMaker.value = result.car_list.map(e => e.checked === true ? e.id : '')
-        this.status.items={}
-        this.status.items= { id: 1, name: result.director_status }
+        this.status.items = {}
+        this.status.items = { id: 1, name: result.director_status }
         this.status.value = this.status.items.name
+        this.carParts.items = result.work_type
+        this.carParts.value = result.work_type.filter(e => e.checked ? e.id : null)
       } catch (e) {
         console.error(e, 'error')
       }
@@ -182,19 +178,22 @@ export default {
           user_token: this.$route.params.id,
           phone_number: this.phoneNumber,
           status: this.status.value,
-          car_list: this.carMaker.value.filter(e=>e!==""),
+          car_list: this.carMaker.value.filter(e => e !== ""),
           wt_list: this.carParts.value.filter(e => e),
         }
         try {
           if (this.$route.meta === 'settings') {
-            delete payload.user_token
+            const payload = {
+              car_list: this.carMaker.value.filter(e => e !== ""),
+              wt_list: this.carParts.value.filter(e => e),
+            }
             payload.company_token = this.$route.params.id
             await this.$API.settings.updateUser(payload)
           } else {
             payload.about = this.about
             await this.$API.car.addUser(payload)
           }
-          alert('Регистрация прошла успешно')
+          this.$route.meta === 'registration' ? alert('Регистрация прошла успешно') : alert('Данные успешно обновлены')
           this.$route.meta === 'registration' ? this.resetForm() : ''
         } catch (e) {
           alert('Произошла ошибка')
