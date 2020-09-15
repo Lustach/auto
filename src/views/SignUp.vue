@@ -136,7 +136,7 @@ export default {
         this.status.items = { id: 1, name: result.director_status }
         this.status.value = this.status.items.name
         this.carParts.items = result.work_type
-        this.carParts.value = result.work_type.filter(e => e.checked ? e.id : null)
+        this.carParts.value = result.work_type.map(e => e.checked ? e.id : null)
       } catch (e) {
         console.error(e, 'error')
       }
