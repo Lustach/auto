@@ -6,7 +6,7 @@ Vue.use(VueRouter)
 
 const routes = [
 	{
-		path: '/token=:id',
+		path: '/signup/token=:id',
 		name: 'SignUp',
 		// component: () => import('../views/SignUp.vue'),
 		meta: 'registration',
@@ -15,10 +15,17 @@ const routes = [
 	{
 		path: '/settings/token=:id',
 		name: 'SignUpSettings',
-    meta: 'settings',
+		meta: 'settings',
 		component: SignUp
 		// component: () => import('../views/SignUp.vue')
-	}
+	},
+	{
+		path: '/successRegistration',
+		name: 'successRegistration',
+		meta: 'successRegistration',
+		component: ()=> import('../views/successRegistration.vue')
+		// component: () => import('../views/SignUp.vue')
+	},
 ]
 
 const router = new VueRouter({

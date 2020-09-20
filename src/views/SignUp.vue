@@ -193,7 +193,7 @@ export default {
             payload.about = this.about
             await this.$API.car.addUser(payload)
           }
-          this.$route.meta === 'registration' ? alert('Регистрация прошла успешно') : alert('Данные успешно обновлены')
+          this.$route.meta === 'registration' ? this.router.push('/successRegistration') : alert('Данные успешно обновлены')
           this.$route.meta === 'registration' ? this.resetForm() : ''
         } catch (e) {
           alert('Произошла ошибка')
