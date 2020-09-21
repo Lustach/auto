@@ -6,7 +6,8 @@
           <v-card-text class="px-2 pt-3 pb-0">
             <v-list v-if="field.items.length>0">
               <v-list-item ripple @click="toggle">
-                <v-list-item-title>Выбрать все</v-list-item-title>
+                <v-list-item-title v-if="checkAll">Выбрать все</v-list-item-title>
+                <v-list-item-title v-else>Получать запросы на</v-list-item-title>
                 <v-list-item-action>
                   <v-icon :color="field.value.length > 0 ? 'indigo lighten-4' : ''">{{ icon }}</v-icon>
                 </v-list-item-action>
@@ -101,6 +102,10 @@ export default {
       required: true,
       default: '',
       type: String,
+    },
+    checkAll:{
+      default: true,
+      type: Boolean
     },
     iconInItem: {
       default: false

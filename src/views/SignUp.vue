@@ -9,7 +9,7 @@
             <div class="d-inline-flex justify-center">
               <v-img height="50" src="@/../public/11.png" width="50"/>
             </div>
-            <div v-if="$route.meta === 'registration'" class="headline text--primary">Регистрация поставщика двигателей</div>
+            <div v-if="$route.meta === 'registration'" class="headline text--primary">Регистрация поставщика ДВС и КПП</div>
             <div v-else class="headline text--primary">Настройки аккаунта</div>
             <p v-if="$route.meta === 'registration'" class="mb-1">Введите данные вашей компании, чтобы получить доступ к заказам.</p>
             <p v-else class="mb-1">Отредактируйте данные вашей компании</p>
@@ -76,7 +76,7 @@
                 <v-col class="pb-0 pt-1" cols="12" md="12">
                   <Field v-if="$route.meta==='registration'" ref="status" :disabled="disabledSettings" :field="status" :multiple="false" label="Ваша должность"></Field>
                   <v-text-field v-else v-model="status.items.name" :disabled="disabledSettings" class="px-3 pt-0"></v-text-field>
-                  <Field ref="carParts" :field="carParts" label="Выберите автозапчасти"></Field>
+                  <Field ref="carParts" :field="carParts" :checkAll="false" label="Выберите автозапчасти"></Field>
                   <Field ref="carMaker" :field="carMaker" :iconInItem="true" label="Выберите марки"></Field>
                 </v-col>
                 <v-col v-if="!disabledSettings" class="pb-0 pt-1 px-6" cols="12" md="12">
@@ -85,7 +85,7 @@
                 <v-col cols="12">
                   <v-layout v-if="this.$route.meta === 'registration'" align-center class="pb-2" justify-center>
                     <v-checkbox v-model="checkbox" class="mt-0 pt-0" hide-details></v-checkbox>
-                    <a href="https://telegra.ph/Soglasie-na-obrabotku-dannyh-08-09" target="_blank">Даю согласие на обработку данных</a>
+                    <a href="https://telegra.ph/POLITIKA-OBRABOTKI-PERSONALNYH-DANNYH-09-20" target="_blank">Даю согласие на обработку данных</a>
                   </v-layout>
                   <v-btn :disabled="!valid || !checkbox" class="mt-1" color="primary" @click="submit">Сохранить</v-btn>
                 </v-col>
@@ -193,7 +193,7 @@ export default {
             payload.about = this.about
             await this.$API.car.addUser(payload)
           }
-          this.$route.meta === 'registration' ? this.router.push('/successRegistration') : alert('Данные успешно обновлены')
+          this.$route.meta === 'registration' ? await this.$router.push('/successRegistration') : alert('Данные успешно обновлены')
           this.$route.meta === 'registration' ? this.resetForm() : ''
         } catch (e) {
           alert('Произошла ошибка')

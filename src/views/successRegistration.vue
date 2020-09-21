@@ -15,7 +15,7 @@
       </v-card-title>
       <v-card-text class="text-center">
         <v-btn
-            class="px-11 mt-4 text-capitalize text-h6"
+            class="px-9 mt-4 text-capitalize text-h6"
             color="primary"
             dark
             rounded
@@ -24,7 +24,7 @@
         >
                 <span class="mx-4">
                 <v-icon>mdi-telegram</v-icon>
-                Telegram
+                Вернуться в бот
                   </span>
         </v-btn>
       </v-card-text>
