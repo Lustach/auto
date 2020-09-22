@@ -9,6 +9,7 @@
             <div class="d-inline-flex justify-center">
               <v-img height="50" src="@/../public/11.png" width="50"/>
             </div>
+<!--            todo $route.meta => computed-->
             <div v-if="$route.meta === 'registration'" class="headline text--primary">Регистрация поставщика ДВС и КПП</div>
             <div v-else class="headline text--primary">Настройки аккаунта</div>
             <p v-if="$route.meta === 'registration'" class="mb-1">Введите данные вашей компании, чтобы получить доступ к заказам.</p>
