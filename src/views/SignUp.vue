@@ -34,6 +34,7 @@
                   <v-text-field
                       v-model="phoneNumber"
                       disabled
+                      :rules="rules.phoneNumber"
                       label="Ваш номер телефона"
                       outlined
                   ></v-text-field>
@@ -153,7 +154,8 @@ export default {
       companyName: [v => !!v || 'Не может быть пустым',],
       cityName: [v => !!v || 'Не может быть пустым',],
       address: [v => !!v || 'Не может быть пустым'],
-      about: [v => !!v || 'Не может быть пустым',]
+      about: [v => !!v || 'Не может быть пустым',],
+      phoneNumber: [v => !!v || 'Не может быть пустым']
     },
     fullName: '',
     companyName: '',
